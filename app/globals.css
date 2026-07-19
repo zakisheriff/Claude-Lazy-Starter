@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/*
+  Claude Lazy Starter — design tokens.
+  Warm paper background, terracotta "clay" accent, disciplined Inter type.
+  Light and dark are both first class.
+*/
+
+:root {
+  --paper: #f7f5ef;
+  --paper-raised: #fbfaf5;
+  --panel: #f0ede4;
+  --panel-strong: #eae6da;
+  --ink: #211f1b;
+  --ink-soft: #6b675f;
+  --ink-faint: #96918663;
+  --line: #e5e1d6;
+  --line-strong: #d8d3c5;
+  --clay: #c15f3c;
+  --clay-soft: #d98c6f;
+  --clay-wash: #f3e6df;
+  --positive: #4a7a54;
+  --warning: #b07a2b;
+  --danger: #b04a3c;
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 22px;
+  --shadow-soft: 0 1px 2px rgba(33, 31, 27, 0.04),
+    0 8px 30px rgba(33, 31, 27, 0.05);
+  --shadow-raised: 0 1px 2px rgba(33, 31, 27, 0.05),
+    0 18px 50px rgba(33, 31, 27, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1e1d1a;
+    --paper-raised: #24221e;
+    --panel: #26241f;
+    --panel-strong: #2c2a24;
+    --ink: #ece8df;
+    --ink-soft: #a39d90;
+    --ink-faint: #6b675f66;
+    --line: #322f29;
+    --line-strong: #3d3a33;
+    --clay: #cf7354;
+    --clay-soft: #b96b50;
+    --clay-wash: #35271f;
+    --positive: #6fa377;
+    --warning: #cc9a4f;
+    --danger: #cf7d6f;
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.25),
+      0 8px 30px rgba(0, 0, 0, 0.28);
+    --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.3),
+      0 18px 50px rgba(0, 0, 0, 0.4);
+  }
+}
+
+:root[data-theme="light"] {
+  --paper: #f7f5ef;
+  --paper-raised: #fbfaf5;
+  --panel: #f0ede4;
+  --panel-strong: #eae6da;
+  --ink: #211f1b;
+  --ink-soft: #6b675f;
+  --line: #e5e1d6;
+  --line-strong: #d8d3c5;
+  --clay: #c15f3c;
+  --clay-wash: #f3e6df;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --paper: #1e1d1a;
+  --paper-raised: #24221e;
+  --panel: #26241f;
+  --panel-strong: #2c2a24;
+  --ink: #ece8df;
+  --ink-soft: #a39d90;
+  --line: #322f29;
+  --line-strong: #3d3a33;
+  --clay: #cf7354;
+  --clay-wash: #35271f;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-panel: var(--panel);
+  --color-panel-strong: var(--panel-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-clay: var(--clay);
+  --color-clay-soft: var(--clay-soft);
+  --color-clay-wash: var(--clay-wash);
+  --color-positive: var(--positive);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-inter), system-ui, "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+
+  --radius-panel: var(--radius);
+  --radius-panel-sm: var(--radius-sm);
+  --radius-panel-lg: var(--radius-lg);
+}
+
+* {
+  border-color: var(--line);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv05" 1, "ss01" 1;
+  letter-spacing: -0.011em;
+}
+
+/* Every text input uses a 16px font size, everywhere. */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+::selection {
+  background: var(--clay-wash);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Lenis smooth scrolling hooks. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Reveal wrapper baseline. GSAP sets the from-state on mount so that,
+   when JavaScript is unavailable, content stays fully visible. */
+[data-reveal] {
+  opacity: 1;
+}
