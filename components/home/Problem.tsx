@@ -43,20 +43,20 @@ export function Problem() {
               <div className="mt-8">
                 <WindowTimeline
                   segments={[
-                    { startHour: 0, endHour: 8, tone: "sleep" },
-                    { startHour: 8, endHour: 12, tone: "faint" },
-                    { startHour: 12, endHour: 17, tone: "window" },
+                    { startHour: 0, endHour: 7, tone: "sleep" },
+                    { startHour: 7, endHour: 13, tone: "wasted" },
+                    { startHour: 13, endHour: 18, tone: "window" },
                   ]}
                   markers={[
-                    { hour: 8, label: "Refreshes", strong: true },
-                    { hour: 12, label: "You start", strong: true },
+                    { hour: 7, label: "Refreshes", strong: true },
+                    { hour: 13, label: "You start", strong: true },
                   ]}
                 />
                 <TimelineLegend
                   className="mt-6"
                   items={[
                     { tone: "sleep", label: "Asleep" },
-                    { tone: "faint", label: "Idle and wasted" },
+                    { tone: "wasted", label: "Idle and wasted" },
                     { tone: "window", label: "The one window you use" },
                   ]}
                 />
@@ -76,13 +76,13 @@ export function Problem() {
               <div className="mt-8">
                 <WindowTimeline
                   segments={[
-                    { startHour: 0, endHour: 8, tone: "sleep" },
-                    { startHour: 8, endHour: 13, tone: "reclaimed" },
-                    { startHour: 13, endHour: 18, tone: "window" },
+                    { startHour: 0, endHour: 7, tone: "sleep" },
+                    { startHour: 7, endHour: 12, tone: "reclaimed" },
+                    { startHour: 12, endHour: 17, tone: "window" },
                   ]}
                   markers={[
-                    { hour: 8, label: "Auto start", strong: true },
-                    { hour: 11, label: "You wake", strong: true },
+                    { hour: 7, label: "Auto start", strong: true },
+                    { hour: 10, label: "You wake", strong: true },
                   ]}
                 />
                 <TimelineLegend

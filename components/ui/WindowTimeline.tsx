@@ -8,7 +8,13 @@ import { cn } from "@/lib/utils/cn";
  * page and the dashboard.
  */
 
-export type Tone = "sleep" | "window" | "reclaimed" | "work" | "faint";
+export type Tone =
+  | "sleep"
+  | "window"
+  | "reclaimed"
+  | "work"
+  | "wasted"
+  | "faint";
 
 export interface Segment {
   startHour: number;
@@ -29,6 +35,8 @@ const toneClass: Record<Tone, string> = {
   reclaimed:
     "bg-[repeating-linear-gradient(135deg,var(--clay)_0,var(--clay)_6px,color-mix(in_srgb,var(--clay)_70%,white)_6px,color-mix(in_srgb,var(--clay)_70%,white)_12px)]",
   work: "bg-[color-mix(in_srgb,var(--clay)_22%,transparent)]",
+  wasted:
+    "bg-[repeating-linear-gradient(135deg,color-mix(in_srgb,var(--ink)_12%,var(--panel))_0,color-mix(in_srgb,var(--ink)_12%,var(--panel))_6px,var(--panel)_6px,var(--panel)_12px)]",
   faint: "bg-panel",
 };
 
@@ -94,28 +102,46 @@ export function WindowTimeline({
         ))}
       </div>
 
-      {/* Marker labels sit below the band so they never crowd the colour. */}
+      {/* Marker labels sit centred directly under their line. When two markers
+          are close, the later one drops to a second row so the labels never
+          overlap while each stays under the moment it names. */}
       {markers.length > 0 ? (
-        <div className="relative mt-2 h-9">
-          {markers.map((m, i) => (
+        (() => {
+          const MIN_GAP = 18; // percent of width before labels would collide
+          let prevPct = -Infinity;
+          let prevRow = -1;
+          const rows = markers.map((m) => {
+            const p = pct(m.hour);
+            const row = p - prevPct < MIN_GAP && prevRow === 0 ? 1 : 0;
+            prevPct = p;
+            prevRow = row;
+            return row;
+          });
+          const twoRows = rows.some((r) => r === 1);
+          return (
             <div
-              key={i}
-              className="absolute -translate-x-1/2 text-center"
-              style={{
-                left: `${Math.min(94, Math.max(6, pct(m.hour)))}%`,
-              }}
+              className="relative mt-3"
+              style={{ height: twoRows ? 42 : 22 }}
             >
-              <span
-                className={cn(
-                  "block text-[12.5px] leading-tight",
-                  m.strong ? "font-medium text-ink" : "text-ink-soft",
-                )}
-              >
-                {m.label}
-              </span>
+              {markers.map((m, i) => (
+                <div
+                  key={i}
+                  className="absolute -translate-x-1/2"
+                  style={{ left: `${pct(m.hour)}%`, top: rows[i] * 20 }}
+                >
+                  <span
+                    className={cn(
+                      "block whitespace-nowrap text-center text-[12.5px] leading-tight",
+                      m.strong ? "font-medium text-ink" : "text-ink-soft",
+                    )}
+                  >
+                    {m.label}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()
       ) : null}
 
       <div className="mt-3 flex justify-between text-[12px] tabular-nums text-ink-soft">

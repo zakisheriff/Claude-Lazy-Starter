@@ -268,8 +268,7 @@ export function DashboardClient({
               Today at a glance
             </h2>
             <p className="mt-1 text-[14px] text-ink-soft">
-              Your sleep and working hours, with the active window laid over the
-              day.
+              Your day, with the active window laid over it.
             </p>
           </div>
           <TimelineLegend
