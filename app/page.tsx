@@ -4,7 +4,7 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { Faq } from "@/components/home/Faq";
 import { Cta } from "@/components/home/Cta";
 import { faq } from "@/content/faq";
-import { faqLd, ldScript } from "@/lib/seo/jsonld";
+import { faqLd, howToLd, ldScript } from "@/lib/seo/jsonld";
 
 export default function HomePage() {
   return (
@@ -14,6 +14,10 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{
           __html: ldScript(faqLd(faq.map((f) => ({ ...f })))),
         }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldScript(howToLd()) }}
       />
       <Hero />
       <Problem />

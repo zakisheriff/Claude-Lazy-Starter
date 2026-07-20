@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   publisher: site.author,
   alternates: { canonical: "/" },
   category: "productivity",
+  manifest: "/manifest.webmanifest",
+  formatDetection: { telephone: false, email: false, address: false },
+  appleWebApp: { capable: true, title: site.shortName, statusBarStyle: "default" },
   openGraph: {
     type: "website",
     siteName: site.name,
@@ -60,7 +63,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f5ef" },
+    { media: "(prefers-color-scheme: light)", color: "#f0ede4" },
     { media: "(prefers-color-scheme: dark)", color: "#1e1d1a" },
   ],
   width: "device-width",

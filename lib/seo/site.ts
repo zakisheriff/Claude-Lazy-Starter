@@ -6,8 +6,8 @@
 export const site = {
   name: "Claude Lazy Starter",
   shortName: "Lazy Starter",
-  // Update this to the production origin once deployed.
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://claudelazystarter.app",
+  // Production origin. Override per environment with NEXT_PUBLIC_SITE_URL.
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://claudelazystarter.theatom.lk",
   tagline: "Never waste a refreshed Claude window while you sleep.",
   description:
     "Claude Lazy Starter watches for your refreshed Claude usage window and starts it automatically, so the five hour clock begins during your sleeping hours instead of your working ones.",

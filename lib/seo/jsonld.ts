@@ -46,6 +46,41 @@ export function organizationLd() {
     "@type": "Organization",
     name: site.name,
     url: site.url,
+    logo: `${site.url}/logo.png`,
+  };
+}
+
+/**
+ * HowTo schema for the setup sequence. Answer and generative engines use this
+ * to present the steps directly, so it mirrors the on page how it works copy.
+ */
+export function howToLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: "How to keep a Claude usage window always running",
+    description:
+      "Set up Claude Lazy Starter so a fresh five hour window starts the moment the last one ends.",
+    step: [
+      {
+        "@type": "HowToStep",
+        position: 1,
+        name: "Connect your account",
+        text: "Link your own Claude web account once. It is used only to send a short message that opens a window.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 2,
+        name: "Turn on automatic activation",
+        text: "Flip one switch. There are no hours to set and nothing to schedule.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 3,
+        name: "Always sit down to a running window",
+        text: "The moment a window ends, a short message starts the next one, so time is always waiting for you.",
+      },
+    ],
   };
 }
 
