@@ -29,3 +29,8 @@ next-env.d.ts
 
 # local data store (file-backed persistence)
 /.data
+
+# captured Claude session (this is your login, never commit it)
+claude-session.json
+
+.DS_Store
