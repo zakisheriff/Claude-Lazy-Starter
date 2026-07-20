@@ -25,15 +25,16 @@ other user's session is ever stored.
   `FileStore` is a file backed implementation under `.data`. Swap it for a
   database without touching the domain or UI.
 - `lib/automation` is the automation boundary. `ActivationDriver` is the
-  interface; `SimulatedDriver` is the current implementation. It behaves like a
-  real browser session without touching claude.ai and can report expired
-  sessions to exercise reconnect handling. A real Playwright driver implements
-  the same interface.
+  interface. Two implementations: `SimulatedDriver` (default, touches nothing)
+  and `PlaywrightDriver` (real, drives claude.ai with a captured session).
+  Selected by `LAZY_DRIVER`. Both are interchangeable.
 - `lib/scheduler` runs a single in process interval, started from
-  `instrumentation.ts`, that opens a window during sleep hours when one is
-  available. Idempotent per window.
+  `instrumentation.ts`. The rule is simple: the moment a window ends and a fresh
+  one is available, it opens it, so a window is always running. Idempotent per
+  window. No sleep or working hours are involved.
 - API routes under `app/api` orchestrate the store and driver: activation,
-  scheduler, connection, settings.
+  scheduler, connection, settings, and session (the guarded upload of the
+  captured Claude login).
 - `lib/seo` holds site config and structured data builders.
 
 ## Current features
@@ -41,22 +42,35 @@ other user's session is ever stored.
 - Landing page explaining the idea with a before and after day timeline.
 - Dashboard: live window status, remaining countdown, next refresh, activation
   status and reason, automatic activation toggle, connect and disconnect,
-  activate now, daily usage timeline, schedule summary, activation history.
-- Settings: automatic activation, activation behavior (message and model),
-  session settings (window length, time zone), working hours, sleep hours.
-  Persisted to the local store.
-- Full SEO, AEO, and GEO: metadata, Open Graph, generated OG image, JSON-LD
-  (SoftwareApplication, WebSite, Organization, BreadcrumbList, FAQPage), robots,
-  sitemap, semantic HTML, accessible controls, reduced motion support.
+  activate now, daily usage timeline, activation history.
+- Settings: intentionally small. Automatic activation on or off, the activation
+  message (default "Hi"), and window length. Persisted to the store.
+- Real automation path: `PlaywrightDriver`, a one time session capture script
+  (`npm run capture-session`), a guarded upload (`npm run upload-session` and
+  `POST /api/session` with `ADMIN_TOKEN`), and a Dockerfile plus `render.yaml`
+  to deploy on an always on host with a persistent disk.
+- Branding: `public/logo.png` drives the app icon, apple icon, favicon, and the
+  Open Graph and Twitter share cards (generated into `app/`), and the navbar and
+  footer marks.
+- Full SEO, AEO, and GEO: metadata, Open Graph, JSON-LD (SoftwareApplication,
+  WebSite, Organization, BreadcrumbList, FAQPage), robots, sitemap, semantic
+  HTML, accessible controls, reduced motion support.
+
+## Design surface
+
+- One warm background everywhere (the `--panel` colour, matching the footer),
+  set on `body`. No near white section backgrounds. Only cards lift above it
+  using `--paper-raised`. The navbar shares the same background.
+- Every interactive control shows a pointer cursor. Every text input is 16px.
 
 ## Future improvements
 
-- Real Playwright driver behind `ActivationDriver`, run as a local or self
-  hosted agent so the session never leaves the user's machine.
+- Harden the Playwright driver against claude.ai bot detection and selector
+  changes (real browser under a virtual display, richer confirmation checks).
 - Durable scheduler (a job runner) in place of the in process interval.
 - Notifications when a window is opened or a session expires.
-- Multiple day history and usage analytics.
-- Optional database repository (Postgres or SQLite).
+- A small in app flow to capture and upload the session, instead of the script.
+- Optional database repository (Postgres or SQLite) in place of the file store.
 
 ## Development rules
 

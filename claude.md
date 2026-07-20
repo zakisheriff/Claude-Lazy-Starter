@@ -10,9 +10,16 @@ into your working day. A five hour usage window only starts once you send a
 message, so a window that refreshes overnight is wasted if you do not touch it
 until midday. The app starts the window for you at refresh time.
 
-Single tenant by design: you connect your own account. The app does not store
-anyone else's Claude session, and this build never touches claude.ai; it uses a
-simulated automation driver behind a clean interface.
+Single tenant by design: you connect your own account. The app never stores
+anyone else's Claude session. It ships with a simulated driver (default) and a
+real Playwright driver, chosen by `LAZY_DRIVER`. The real driver must run on an
+always on host (a laptop that sleeps cannot fire overnight); see README for the
+Render deployment and the session capture flow.
+
+Core behaviour is deliberately simple: with automatic activation on, the moment
+one window ends a fresh one is started by sending a short message (default "Hi"),
+so a window is always running and there is always time waiting when you sit down.
+There are no sleep or working hours to configure.
 
 ## Architecture information
 
@@ -22,10 +29,12 @@ simulated automation driver behind a clean interface.
 - Layers:
   - `lib/domain`: pure window, schedule, and decision logic.
   - `lib/store`: `Repository` interface and a file backed store under `.data`.
-  - `lib/automation`: `ActivationDriver` interface and the simulated driver,
-    plus a shared `runActivation` service.
-  - `lib/scheduler`: in process interval started by `instrumentation.ts`.
-  - `app/api`: activation, scheduler, connection, settings routes.
+  - `lib/automation`: `ActivationDriver` interface, the simulated and Playwright
+    drivers, and a shared `runActivation` service.
+  - `lib/scheduler`: in process interval started by `instrumentation.ts` that
+    starts a fresh window as soon as one is available.
+  - `app/api`: activation, scheduler, connection, settings, and the guarded
+    session upload routes.
   - `lib/seo`: site config and JSON-LD builders.
 - UI: reusable primitives in `components/ui`, layout in `components/layout`,
   scroll reveals in `components/motion`, page sections in
@@ -38,19 +47,17 @@ simulated automation driver behind a clean interface.
 - Home: hero, before and after comparison, ordered how it works, FAQ, closing
   call to action. Every section fills the viewport.
 - Dashboard: window status, activation status and reason, next refresh,
-  remaining estimate, activation history, daily usage timeline, working and
-  sleep schedule, activate now, automatic activation toggle, connect and
-  disconnect, expired session prompt.
-- Settings: automatic activation, activation behavior, session settings, working
-  hours, sleep hours. Saved to the local store.
-- SEO, AEO, GEO fully configured.
+  remaining estimate, activation history, daily usage timeline, activate now,
+  automatic activation toggle, connect and disconnect, expired session prompt.
+- Settings: automatic activation, the activation message, and window length.
+- SEO, AEO, GEO fully configured. Branding driven by `public/logo.png`.
 
 ## Future improvements
 
-- Real Playwright driver, run locally so the session stays on the user's machine.
-- Durable job based scheduler.
+- Harden the Playwright driver against bot detection and selector drift.
+- Durable job based scheduler in place of the in process interval.
 - Activation and expiry notifications.
-- Analytics and longer history.
+- In app session capture and upload, instead of the script.
 - Database backed repository.
 
 ## Development rules
