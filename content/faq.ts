@@ -26,6 +26,6 @@ export const faq = [
   {
     question: "Can I control when it activates?",
     answer:
-      "Yes. You set your sleep hours and working hours, choose the activation message and model, and can turn automatic activation off entirely and start windows by hand from the dashboard.",
+      "It is intentionally simple. With automatic activation on, it starts a fresh window the moment the last one ends, so a window is always running. You can change the short activation message, turn automatic activation off, and start a window by hand from the dashboard whenever you like.",
   },
 ] as const;

@@ -8,17 +8,17 @@ const steps = [
   {
     n: "1",
     title: "Connect your account",
-    body: "Link your own Claude web account once. The session stays on your machine and is used only to open a window, never to read or move your work.",
+    body: "Link your own Claude web account once. The session is used only to send a short message that opens a window, never to read or move your work.",
   },
   {
     n: "2",
-    title: "Set your hours",
-    body: "Tell it when you sleep and when you work. Automatic activation only opens a window during your sleeping hours, so it never eats into a session you would have started yourself.",
+    title: "Turn on automatic activation",
+    body: "Flip one switch. From then on it watches your usage window and needs nothing else from you. There are no hours to set and nothing to schedule.",
   },
   {
     n: "3",
-    title: "Wake up to a running window",
-    body: "When usage refreshes overnight, it sends a short message to start the window. By the time you sit down, the clock is already running in your favour.",
+    title: "Always sit down to a running window",
+    body: "The moment a window ends, it sends a quick hi to start the next one. So whenever you come to work, this window still has time left and a fresh one is already queued behind it.",
   },
 ] as const;
 

@@ -26,7 +26,7 @@ export async function getSnapshot(): Promise<DashboardSnapshot> {
   const state = await store.read();
   const now = new Date();
   const window = computeWindow(state, now);
-  const decision = decideAutoActivation(state, window, now);
+  const decision = decideAutoActivation(state, window);
 
   return {
     now: now.toISOString(),

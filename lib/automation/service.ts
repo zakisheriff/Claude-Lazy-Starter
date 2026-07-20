@@ -18,9 +18,13 @@ export async function runActivation(
   const driver = getDriver();
   const now = new Date();
 
+  // The session opens on whatever model claude.ai currently has selected;
+  // we do not pick one, keeping the tool simple.
+  const model = "current model";
+
   const result = await driver.activate({
     message: settings.activationMessage,
-    model: settings.model,
+    model,
     trigger,
   });
 
@@ -30,7 +34,7 @@ export async function runActivation(
     trigger,
     status: result.status,
     message: settings.activationMessage,
-    model: settings.model,
+    model,
     detail: result.detail,
     windowKey: view.windowKey,
   };

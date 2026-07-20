@@ -3,6 +3,7 @@ import type {
   AppState,
   ConnectionState,
   SchedulerState,
+  SessionState,
   Settings,
 } from "./types";
 
@@ -16,6 +17,7 @@ export interface Repository {
   updateSettings(patch: Partial<Settings>): Promise<Settings>;
   setConnection(patch: Partial<ConnectionState>): Promise<ConnectionState>;
   setScheduler(patch: Partial<SchedulerState>): Promise<SchedulerState>;
+  setSession(patch: Partial<SessionState>): Promise<SessionState>;
   addActivation(record: ActivationRecord): Promise<ActivationRecord>;
   /** Newest first, capped at limit. */
   listActivations(limit?: number): Promise<ActivationRecord[]>;

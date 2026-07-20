@@ -24,30 +24,13 @@ export interface ActivationRecord {
   windowKey?: string;
 }
 
-export interface HourRange {
-  /** Hour of day the range starts, 0 to 23. */
-  start: number;
-  /** Hour of day the range ends, 0 to 23. May wrap past midnight. */
-  end: number;
-}
-
 export interface Settings {
   /** Length of a usage window in hours. */
   windowHours: number;
-  /** Whether the scheduler may activate windows on your behalf. */
+  /** Whether a fresh window is started automatically the moment one is free. */
   autoActivation: boolean;
-  /** The message sent to open a fresh session. Keep it short. */
+  /** The short message sent to open a fresh window. */
   activationMessage: string;
-  /** Model the automated session starts on. */
-  model: string;
-  /** Only activate once the window has been available this many minutes. */
-  activationDelayMinutes: number;
-  /** Hours you are usually working. */
-  workingHours: HourRange;
-  /** Hours you are usually asleep. Activation is preferred here. */
-  sleepHours: HourRange;
-  /** IANA time zone label, shown for clarity. */
-  timeZone: string;
 }
 
 export interface ConnectionState {
@@ -66,9 +49,21 @@ export interface SchedulerState {
   lastActivatedWindowKey: string | null;
 }
 
+/**
+ * The captured Claude web session. `storageState` is the Playwright storage
+ * state JSON (cookies and local storage) produced by the one time login. It is
+ * what lets the always on server open claude.ai as you. Kept out of API GET
+ * responses so it is never sent to the browser.
+ */
+export interface SessionState {
+  storageState: string | null;
+  capturedAt: string | null;
+}
+
 export interface AppState {
   settings: Settings;
   connection: ConnectionState;
   scheduler: SchedulerState;
+  session: SessionState;
   activations: ActivationRecord[];
 }

@@ -7,10 +7,15 @@ import type {
   AppState,
   ConnectionState,
   SchedulerState,
+  SessionState,
   Settings,
 } from "./types";
 
-const DATA_DIR = path.join(process.cwd(), ".data");
+// On an always on host (for example Render) point LAZY_DATA_DIR at a mounted
+// persistent disk so the captured session and history survive restarts.
+const DATA_DIR = process.env.LAZY_DATA_DIR
+  ? path.resolve(process.env.LAZY_DATA_DIR)
+  : path.join(process.cwd(), ".data");
 const DATA_FILE = path.join(DATA_DIR, "state.json");
 const MAX_HISTORY = 200;
 
@@ -32,6 +37,7 @@ class FileStore implements Repository {
         settings: { ...base.settings, ...parsed.settings },
         connection: { ...base.connection, ...parsed.connection },
         scheduler: { ...base.scheduler, ...parsed.scheduler },
+        session: { ...base.session, ...parsed.session },
         activations: parsed.activations ?? base.activations,
       };
     } catch {
@@ -81,6 +87,13 @@ class FileStore implements Repository {
     return this.mutate((state) => {
       state.scheduler = { ...state.scheduler, ...patch };
       return state.scheduler;
+    });
+  }
+
+  setSession(patch: Partial<SessionState>): Promise<SessionState> {
+    return this.mutate((state) => {
+      state.session = { ...state.session, ...patch };
+      return state.session;
     });
   }
 

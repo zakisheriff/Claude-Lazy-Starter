@@ -2,13 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DashboardSnapshot } from "@/lib/domain/snapshot";
-import type { HourRange } from "@/lib/store/types";
 import {
   formatClock,
   formatCountdown,
   formatDateTime,
   formatDuration,
-  formatHour,
 } from "@/lib/time/format";
 import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
@@ -31,19 +29,9 @@ function buildSegments(snapshot: DashboardSnapshot): {
   segments: Segment[];
   markers: { hour: number; label: string; strong?: boolean }[];
 } {
-  const { window, settings } = snapshot;
-  const segments: Segment[] = [
-    {
-      startHour: settings.sleepHours.start,
-      endHour: settings.sleepHours.end,
-      tone: "sleep",
-    },
-    {
-      startHour: settings.workingHours.start,
-      endHour: settings.workingHours.end,
-      tone: "work",
-    },
-  ];
+  const { window } = snapshot;
+  // A quiet full day base, with the active window laid over it.
+  const segments: Segment[] = [{ startHour: 0, endHour: 24, tone: "faint" }];
   const markers: { hour: number; label: string; strong?: boolean }[] = [];
 
   if (window.active && window.startedAt && window.endsAt) {
@@ -55,10 +43,6 @@ function buildSegments(snapshot: DashboardSnapshot): {
   }
 
   return { segments, markers };
-}
-
-function scheduleLabel(range: HourRange): string {
-  return `${formatHour(range.start)} to ${formatHour(range.end)}`;
 }
 
 export function DashboardClient({
@@ -290,9 +274,8 @@ export function DashboardClient({
           </div>
           <TimelineLegend
             items={[
-              { tone: "sleep", label: "Sleep" },
-              { tone: "work", label: "Working" },
               { tone: "window", label: "Active window" },
+              { tone: "faint", label: "Rest of the day" },
             ]}
           />
         </div>
@@ -303,30 +286,29 @@ export function DashboardClient({
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.4fr]">
         <Panel className="flex flex-col gap-6 p-7 md:p-8">
           <h2 className="text-2xl font-medium tracking-tight text-ink">
-            Your schedule
+            How it runs
           </h2>
           <div className="flex flex-col gap-5">
-            <div>
-              <p className="text-[14px] text-ink-soft">Sleep hours</p>
-              <p className="mt-1 text-[17px] text-ink">
-                {scheduleLabel(settings.sleepHours)}
-              </p>
-            </div>
-            <div>
-              <p className="text-[14px] text-ink-soft">Working hours</p>
-              <p className="mt-1 text-[17px] text-ink">
-                {scheduleLabel(settings.workingHours)}
-              </p>
-            </div>
             <div>
               <p className="text-[14px] text-ink-soft">Window length</p>
               <p className="mt-1 text-[17px] text-ink">
                 {formatDuration(settings.windowHours * 3600000)}
               </p>
             </div>
+            <div>
+              <p className="text-[14px] text-ink-soft">Activation message</p>
+              <p className="mt-1 text-[17px] text-ink">
+                {settings.activationMessage}
+              </p>
+            </div>
+            <p className="text-[14px] leading-relaxed text-ink-soft">
+              The moment a window ends, a fresh one starts automatically. So
+              whenever you sit down, this window still has time left and a full
+              one follows it.
+            </p>
           </div>
           <Button href="/settings" variant="secondary" className="mt-2 self-start">
-            Adjust schedule
+            Change settings
           </Button>
         </Panel>
 

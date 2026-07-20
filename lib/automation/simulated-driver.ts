@@ -86,7 +86,7 @@ class SimulatedDriver implements ActivationDriver {
 
     return {
       status: "success",
-      detail: `Opened a session on ${options.model} and sent the activation message.`,
+      detail: `Sent "${options.message}" and started a fresh window.`,
     };
   }
 }

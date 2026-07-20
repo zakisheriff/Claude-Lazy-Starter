@@ -1,12 +1,13 @@
 import type { AppState } from "@/lib/store/types";
-import { isWithinRange } from "./schedule";
 import type { WindowView } from "./window";
 
 /**
- * Decides whether the scheduler should open a fresh window right now. The rule
- * mirrors the product idea: only act when a window is genuinely available, the
- * account is connected, automation is on, and you are inside your sleep hours,
- * and never open the same available window twice.
+ * Decides whether to open a fresh window right now. The rule is deliberately
+ * simple: the moment the current window ends, a new one is available, so start
+ * it. That keeps a window always running, so whenever you sit down there is
+ * time left on the current one and a full window waiting after it. It only acts
+ * when automation is on, the account is connected, and the same window has not
+ * already been started.
  */
 
 export interface AutoDecision {
@@ -17,7 +18,6 @@ export interface AutoDecision {
 export function decideAutoActivation(
   state: AppState,
   view: WindowView,
-  now: Date = new Date(),
 ): AutoDecision {
   const { settings, scheduler, connection } = state;
 
@@ -30,24 +30,18 @@ export function decideAutoActivation(
   if (!view.availableNow) {
     return {
       shouldActivate: false,
-      reason: "A window is already active.",
+      reason: "A window is active. The next one starts the moment it ends.",
     };
   }
   if (scheduler.lastActivatedWindowKey === view.windowKey) {
     return {
       shouldActivate: false,
-      reason: "This window was already started.",
-    };
-  }
-  if (!isWithinRange(now, settings.sleepHours)) {
-    return {
-      shouldActivate: false,
-      reason: "Outside your sleep hours, leaving the window for you.",
+      reason: "This window was already started. Waiting for it to finish.",
     };
   }
   return {
     shouldActivate: true,
-    reason: "A fresh window is available during sleep hours.",
+    reason: "A fresh window is available. Starting it now.",
   };
 }
 

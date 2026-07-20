@@ -9,8 +9,8 @@ export function Cta() {
           Reclaim the morning you already paid for
         </h2>
         <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-ink-soft">
-          Connect your account, set your hours, and let the window start itself.
-          The time you were losing to sleep becomes time you can actually use.
+          Connect your account, turn on automatic activation, and let the window
+          start itself. There is always time waiting, whenever you sit down.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button href="/dashboard" size="lg">
