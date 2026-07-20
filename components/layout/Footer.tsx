@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/seo/site";
 
@@ -7,7 +8,16 @@ export function Footer() {
     <footer className="border-t border-line bg-panel">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-16 lg:flex-row lg:items-start lg:justify-between lg:px-8">
         <div className="max-w-sm">
-          <p className="text-[17px] font-semibold text-ink">{site.name}</p>
+          <div className="flex items-center gap-2.5">
+            <Image
+              src="/logo.png"
+              alt=""
+              width={30}
+              height={30}
+              className="h-7 w-7 rounded-[7px]"
+            />
+            <p className="text-[17px] font-semibold text-ink">{site.name}</p>
+          </div>
           <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">
             {site.tagline} A personal tool that starts your refreshed window
             while you sleep, so the time is yours when you wake up.

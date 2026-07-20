@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { site } from "@/lib/seo/site";
@@ -35,12 +36,23 @@ export function Navbar() {
         className={cn(
           "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
           scrolled
-            ? "border-b border-line bg-paper/85 backdrop-blur-md"
+            ? "border-b border-line bg-panel/85 backdrop-blur-md"
             : "border-b border-transparent",
         )}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 lg:px-8">
-          <Link href="/" className="text-[17px] font-semibold tracking-tight text-ink">
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 text-[17px] font-semibold tracking-tight text-ink"
+          >
+            <Image
+              src="/logo.png"
+              alt=""
+              width={30}
+              height={30}
+              priority
+              className="h-7 w-7 rounded-[7px]"
+            />
             {site.name}
           </Link>
 
@@ -79,7 +91,7 @@ export function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             onClick={() => setOpen((v) => !v)}
-            className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
+            className="relative z-50 flex h-10 w-10 cursor-pointer flex-col items-center justify-center gap-1.5 md:hidden"
           >
             <span
               className={cn(

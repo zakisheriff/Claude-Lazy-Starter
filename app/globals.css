@@ -118,7 +118,9 @@ html {
 }
 
 body {
-  background-color: var(--paper);
+  /* One warm background everywhere, matching the footer. No near white
+     sections; only cards lift above this surface. */
+  background-color: var(--panel);
   color: var(--ink);
   font-family: var(--font-sans);
   font-feature-settings: "cv05" 1, "ss01" 1;

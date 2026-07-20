@@ -30,11 +30,11 @@ export function Toggle({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        "relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border transition-colors duration-200",
+        "relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full border transition-colors duration-200",
         checked
           ? "border-clay bg-clay"
           : "border-line-strong bg-panel-strong",
-        disabled && "opacity-50",
+        disabled && "cursor-not-allowed opacity-50",
       )}
     >
       <motion.span

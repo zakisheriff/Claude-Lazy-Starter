@@ -107,7 +107,7 @@ export function MobileMenu({
     <div
       ref={overlayRef}
       id="mobile-menu"
-      className="fixed inset-0 z-40 flex flex-col bg-paper md:hidden"
+      className="fixed inset-0 z-40 flex flex-col bg-panel md:hidden"
       style={{ clipPath: "inset(0 0 100% 0)" }}
       aria-hidden={!open}
     >

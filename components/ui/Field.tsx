@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils/cn";
 
+// text-base pins every control to 16px, reinforced by the global input rule.
 const controlBase =
-  "w-full rounded-[var(--radius-sm)] border border-line-strong bg-paper px-4 py-2.5 text-ink placeholder:text-ink-soft/70 transition-colors focus:border-clay focus:outline-none";
+  "w-full rounded-[var(--radius-sm)] border border-line-strong bg-paper px-4 py-2.5 text-base text-ink placeholder:text-ink-soft/70 transition-colors focus:border-clay focus:outline-none";
 
 export function Field({
   label,
