@@ -54,7 +54,12 @@ website. The source repository is private, so the site never links to it.
   computer, installs the GitHub CLI if missing, has the reader sign in to GitHub
   with the workflow scope, creates the private repository, uploads the workflow
   through the GitHub API (no git needed), has the reader create and save the
-  token in their own terminal, then runs and verifies the workflow.
+  token in their own terminal (or on the GitHub secrets page), then runs and
+  verifies the workflow. The runner repository is named
+  claude-lazy-starter-runner because GitHub repository names ignore case and
+  claude-lazy-starter collides with this public site repository; the prompt
+  never reuses a public repository. The copy of the workflow in this site
+  repository is the reference and is disabled here on GitHub.
 - Questions, closing call to action.
 - Footer: a full viewport dark closing page, no logo. Link columns, a centered
   one line serif wordmark, and the credit "built by The Atom" (theatom.lk).

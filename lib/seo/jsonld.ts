@@ -120,7 +120,7 @@ export function howToLd() {
         "@type": "HowToStep",
         position: 2,
         name: "Let Claude set up GitHub",
-        text: "Claude installs the GitHub CLI if it is missing, has you sign in to GitHub in your browser, then creates a private repository named claude-lazy-starter and adds the Lazy start workflow.",
+        text: "Claude installs the GitHub CLI if it is missing, has you sign in to GitHub in your browser, then creates a private repository named claude-lazy-starter-runner and adds the Lazy start workflow.",
       },
       {
         "@type": "HowToStep",

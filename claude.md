@@ -42,7 +42,10 @@ The source repository is private; the site never links to it.
 - Timelines, comparison table, hour by hour night, questions.
 - One prompt setup: installs and signs in to the GitHub CLI (workflow scope),
   creates the repository, uploads the workflow via the GitHub API, has the
-  reader save the token themselves, then runs and verifies it.
+  reader save the token themselves, then runs and verifies it. The runner
+  repository is claude-lazy-starter-runner (names ignore case, so the plain
+  name would collide with this public repo). The workflow here is disabled on
+  GitHub and kept only as the reference copy.
 - Full viewport footer with a centered wordmark and the credit to The Atom
   (theatom.lk), who builds Claude Lazy Starter.
 - SEO, AEO, GEO: linked JSON-LD graph (Organization The Atom, WebSite, WebPage

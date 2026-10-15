@@ -23,9 +23,9 @@ Work through these steps one at a time. Tell me what you are doing, check each s
 gh auth login --hostname github.com --git-protocol https --web --scopes workflow
 (If I am already signed in but only the workflow scope is missing, ask me to run gh auth refresh --hostname github.com --scopes workflow instead.) If I do not have a GitHub account, tell me to create a free one at github.com/signup first. When I am done, run gh auth status again and find my username with gh api user --jq .login.
 
-3. Create a private GitHub repository named claude-lazy-starter in my account with gh repo create claude-lazy-starter --private --add-readme. If it already exists, reuse it.
+3. Create a private GitHub repository named claude-lazy-starter-runner in my account with gh repo create claude-lazy-starter-runner --private --add-readme. Repository names ignore capital letters, so first check with gh repo view MY_USERNAME/claude-lazy-starter-runner. If a repository with that name already exists, only reuse it if it is private and was made for this; otherwise never touch it and pick a new name like claude-lazy-starter-runner-2. Never put the workflow or the token in a public repository.
 
-4. Add the file .github/workflows/lazy-start.yml to that repository with exactly the content below. Upload it with the GitHub API (gh api, the repository contents endpoint, base64 encoded content) so git is not needed. If the file already exists, update it. Then confirm it shows up with gh workflow list --repo MY_USERNAME/claude-lazy-starter.
+4. Add the file .github/workflows/lazy-start.yml to that repository with exactly the content below. Upload it with the GitHub API (gh api, the repository contents endpoint, base64 encoded content) so git is not needed. If the file already exists, update it. Then confirm it shows up with gh workflow list --repo MY_USERNAME/claude-lazy-starter-runner.
 
 \`\`\`yaml
 ${workflow}
@@ -34,10 +34,10 @@ ${workflow}
 5. Create my Claude token. Ask me to run claude setup-token in a separate terminal window and finish the sign in in my browser with the Claude account that has my Pro or Max plan. It prints a long token. Do not ask me to paste the token into this chat.
 
 6. Save the token in GitHub. Give me this exact command with my real username filled in, ask me to run it in that same terminal, and paste the token when it asks:
-gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo MY_USERNAME/claude-lazy-starter
-When I am done, check it with gh secret list --repo MY_USERNAME/claude-lazy-starter (it only shows the name, never the value).
+gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo MY_USERNAME/claude-lazy-starter-runner
+If pasting into the terminal does not work, have me add it on the GitHub website instead at https://github.com/MY_USERNAME/claude-lazy-starter-runner/settings/secrets/actions/new with the name CLAUDE_CODE_OAUTH_TOKEN. The token is long and wraps over several lines, so remind me to copy all of it. When I am done, check it with gh secret list --repo MY_USERNAME/claude-lazy-starter-runner (it only shows the name, never the value).
 
-7. Test it. Start the workflow once with gh workflow run lazy-start.yml --repo MY_USERNAME/claude-lazy-starter, wait a few seconds, find the run with gh run list, follow it with gh run watch, and tell me whether it succeeded. If it failed, read the logs with gh run view --log-failed, explain the problem in plain words, help me fix it, and run it again until it passes.
+7. Test it. Start the workflow once with gh workflow run lazy-start.yml --repo MY_USERNAME/claude-lazy-starter-runner, wait a few seconds, find the run with gh run list, follow it with gh run watch, and tell me whether it succeeded. If it failed, read the logs with gh run view --log-failed, explain the problem in plain words (a 401 OAuth access token is invalid error means the token was copied incompletely, so have me create a new one and save it again), help me fix it, and run it again until it passes.
 
 8. Finish by giving me the repository link and the Actions page link, and confirm it will now run every hour on its own. Tell me how to check it worked: the next morning, Settings then Usage on claude.ai should show my window resetting early in the day.`;
 

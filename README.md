@@ -169,7 +169,7 @@ Copy the prompt from the **[Set it up](https://claudelazystarter.theatom.lk/#set
 ```text
 1. Check your computer and install the GitHub CLI if it is missing
 2. Have you sign in to GitHub in your browser (with the workflow scope)
-3. Create a private repository named claude-lazy-starter
+3. Create a private repository named claude-lazy-starter-runner
 4. Add .github/workflows/lazy-start.yml through the GitHub API (no git needed)
 5. Ask you to run claude setup-token in your own terminal
 6. Ask you to save it with gh secret set CLAUDE_CODE_OAUTH_TOKEN
@@ -187,10 +187,10 @@ From then on it runs every hour by itself. 🎉
 claude setup-token
 
 # 2. Save it as a secret in your own private repository
-gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo OWNER/claude-lazy-starter
+gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo OWNER/claude-lazy-starter-runner
 
 # 3. Copy .github/workflows/lazy-start.yml into that repository, then run it once
-gh workflow run lazy-start.yml --repo OWNER/claude-lazy-starter
+gh workflow run lazy-start.yml --repo OWNER/claude-lazy-starter-runner
 ```
 
 ### Running the Website Locally
