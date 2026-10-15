@@ -34,3 +34,5 @@ next-env.d.ts
 claude-session.json
 
 .DS_Store
+claude-assets/
+.claude/

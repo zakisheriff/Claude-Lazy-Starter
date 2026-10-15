@@ -73,7 +73,7 @@ export function WindowTimeline({
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="relative h-16 w-full overflow-hidden rounded-[var(--radius-sm)] border border-line bg-panel">
+      <div className="relative h-14 w-full overflow-hidden rounded-[4px] border border-line bg-panel">
         {resolved.map((s, i) => (
           <div
             key={i}

@@ -1,76 +1,62 @@
 import Reveal from "@/components/motion/Reveal";
-import { Button } from "@/components/ui/Button";
-import {
-  TimelineLegend,
-  WindowTimeline,
-} from "@/components/ui/WindowTimeline";
+import { sections } from "./sections";
 
 /**
- * Landing hero. The thesis is the timeline itself: a day where the refreshed
- * window is started at eight in the morning while you sleep, so four hours move
- * back into your working day. The headline states the promise plainly.
+ * Landing hero. A night sky over a glowing horizon, which is the whole idea in
+ * one picture: the window starts while the world is still dark. Below the
+ * title, a numbered contents list leads into the article.
  */
 export function Hero() {
   return (
-    <section className="relative flex min-h-screen flex-col justify-center px-6 pt-28 pb-20 lg:px-8">
-      <div className="mx-auto w-full max-w-4xl text-center">
+    <section
+      data-hero
+      className="grain relative flex min-h-[112svh] flex-col items-center overflow-hidden bg-night text-on-night"
+    >
+      {/* Sky, from deep night at the top through blue and lilac to the warm
+          band just above the horizon. */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, #0b1020 0%, #16264a 14%, #3a5b93 30%, #6d86b9 40%, #9a8fb8 47%, #d08a6c 53%, #ec7a3c 57%, #2a1610 63%, #120c0a 100%)",
+        }}
+      />
+      {/* The curve of the planet. Its top edge catches the light. */}
+      <div
+        aria-hidden
+        className="absolute left-1/2 top-[57%] aspect-square w-[340vw] -translate-x-1/2 rounded-[50%] bg-[#120c0a] shadow-[0_-18px_70px_rgba(236,122,60,0.75),0_-3px_10px_rgba(255,190,140,0.9)] sm:w-[260vw]"
+      />
+
+      <div className="relative z-10 flex w-full flex-1 flex-col items-center px-6 pt-[26vh] sm:pt-[32vh] text-center">
         <Reveal>
-          <h1 className="text-balance text-5xl font-semibold leading-[1.05] tracking-tight text-ink md:text-7xl">
-            Stop losing Claude hours while you sleep
-          </h1>
+          <p className="text-[13px] font-medium tracking-[0.14em] text-[#f2ede4] uppercase sm:text-[15px]">
+            For Claude Pro and Max
+          </p>
         </Reveal>
         <Reveal delay={0.05}>
-          <p className="mx-auto mt-7 max-w-2xl text-balance text-lg leading-relaxed text-ink-soft md:text-xl">
-            Your usage window only starts once you send a message. Claude Lazy
-            Starter opens it the moment it refreshes, so the five hour clock runs
-            through the early morning instead of the middle of your workday.
-          </p>
+          <h1 className="mt-8 font-serif text-[clamp(52px,9vw,124px)] leading-[0.95] font-medium tracking-[-0.025em] text-[#f2ede4]">
+            Claude Lazy Starter
+          </h1>
         </Reveal>
-        <Reveal delay={0.1}>
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button href="/dashboard" size="lg">
-              Open dashboard
-            </Button>
-            <Button href="/settings" size="lg" variant="secondary">
-              Set your hours
-            </Button>
-          </div>
+
+        <Reveal delay={0.12} className="mt-[22vh] w-full max-w-[460px] sm:mt-[13vh]">
+          <ol className="flex flex-col gap-2.5">
+            {sections.map((s, i) => (
+              <li key={s.id}>
+                <a
+                  href={`#${s.id}`}
+                  className="flex items-baseline font-serif text-[17px] text-[#f2ede4] transition-opacity hover:opacity-70"
+                >
+                  <span className="font-mono text-[13px]">({i + 1})</span>
+                  <span className="leader" aria-hidden />
+                  <span>{s.title}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
         </Reveal>
       </div>
-
-      <Reveal
-        delay={0.15}
-        className="mx-auto mt-16 w-full max-w-4xl rounded-[var(--radius-lg)] border border-line bg-paper-raised p-6 shadow-[var(--shadow-soft)] md:p-8"
-      >
-        <div className="mb-5 flex flex-col gap-1 text-left">
-          <p className="text-[15px] font-medium text-ink">
-            A window refreshing at 8:00 am
-          </p>
-          <p className="text-[14px] text-ink-soft">
-            Started automatically at refresh, ending at 1:00 pm, ready before you
-            sit down.
-          </p>
-        </div>
-        <WindowTimeline
-          segments={[
-            { startHour: 0, endHour: 8, tone: "sleep" },
-            { startHour: 8, endHour: 13, tone: "window" },
-            { startHour: 8, endHour: 12, tone: "reclaimed" },
-          ]}
-          markers={[
-            { hour: 8, label: "Refresh and auto start", strong: true },
-            { hour: 12, label: "You wake up", strong: true },
-          ]}
-        />
-        <TimelineLegend
-          className="mt-6"
-          items={[
-            { tone: "sleep", label: "Asleep" },
-            { tone: "reclaimed", label: "Hours reclaimed" },
-            { tone: "window", label: "Active window" },
-          ]}
-        />
-      </Reveal>
     </section>
   );
 }

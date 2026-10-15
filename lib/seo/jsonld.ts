@@ -60,25 +60,31 @@ export function howToLd() {
     "@type": "HowTo",
     name: "How to keep a Claude usage window always running",
     description:
-      "Set up Claude Lazy Starter so a fresh five hour window starts the moment the last one ends.",
+      "Set up Claude Lazy Starter so a fresh five hour window starts within an hour of the last one ending, even while you sleep.",
     step: [
       {
         "@type": "HowToStep",
         position: 1,
-        name: "Connect your account",
-        text: "Link your own Claude web account once. It is used only to send a short message that opens a window.",
+        name: "Get your own copy",
+        text: "Fork the Claude Lazy Starter repository into your GitHub account.",
       },
       {
         "@type": "HowToStep",
         position: 2,
-        name: "Turn on automatic activation",
-        text: "Flip one switch. There are no hours to set and nothing to schedule.",
+        name: "Create a token",
+        text: "Run claude setup-token on your computer, sign in, and copy the token.",
       },
       {
         "@type": "HowToStep",
         position: 3,
-        name: "Always sit down to a running window",
-        text: "The moment a window ends, a short message starts the next one, so time is always waiting for you.",
+        name: "Save it as a secret",
+        text: "Add the token as a repository secret named CLAUDE_CODE_OAUTH_TOKEN.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 4,
+        name: "Turn it on",
+        text: "Enable workflows in the Actions tab and run Lazy start once. It then runs every hour.",
       },
     ],
   };

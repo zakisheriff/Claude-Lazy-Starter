@@ -16,7 +16,7 @@ function SectionHeading({
 }) {
   return (
     <div className="max-w-sm">
-      <h2 className="text-2xl font-medium tracking-tight text-ink">{title}</h2>
+      <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-ink">{title}</h2>
       <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
         {description}
       </p>

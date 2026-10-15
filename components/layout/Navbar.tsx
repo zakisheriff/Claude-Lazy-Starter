@@ -6,83 +6,100 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { site } from "@/lib/seo/site";
 import { cn } from "@/lib/utils/cn";
-import { Button } from "@/components/ui/Button";
 import { MobileMenu } from "./MobileMenu";
 
 /**
- * Sticky top navigation. It stays quiet, thickening its background only once
- * the page has scrolled. The hamburger opens a full page menu on small screens.
+ * Top navigation. Over the dark hero on the home page it is transparent with
+ * light text; once the page scrolls past the hero it settles onto the ivory
+ * paper with dark text. Other pages always use the light treatment.
  */
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [overHero, setOverHero] = useState(pathname === "/");
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    const update = () => {
+      const hero = document.querySelector<HTMLElement>("[data-hero]");
+      if (!hero) {
+        setOverHero(false);
+        return;
+      }
+      setOverHero(window.scrollY < hero.offsetHeight - 68);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [pathname]);
 
-  // Close the menu on navigation.
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  const dark = overHero && !open;
 
   return (
     <>
       <header
         className={cn(
           "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-          scrolled
-            ? "border-b border-line bg-panel/85 backdrop-blur-md"
-            : "border-b border-transparent",
+          dark
+            ? "bg-transparent text-on-night"
+            : "border-b border-line bg-paper/90 text-ink backdrop-blur-md",
         )}
       >
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 lg:px-8">
+        <div className="mx-auto flex h-[68px] max-w-[1400px] items-center justify-between px-6 lg:px-16">
           <Link
             href="/"
-            className="flex items-center gap-2.5 text-[17px] font-semibold tracking-tight text-ink"
+            className="flex items-center gap-2.5 text-[17px] font-medium tracking-[-0.01em]"
           >
             <Image
               src="/logo.png"
               alt=""
-              width={30}
-              height={30}
+              width={28}
+              height={28}
               priority
-              className="h-7 w-7 rounded-[7px]"
+              className="h-7 w-7 rounded-[6px]"
             />
             {site.name}
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
-            {site.nav.map((item) => {
-              const active =
-                item.href === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "rounded-full px-4 py-2 text-[15px] transition-colors",
-                    active
-                      ? "text-ink"
-                      : "text-ink-soft hover:text-ink",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="hidden md:block">
-            <Button href="/dashboard" size="md">
-              Open dashboard
-            </Button>
+          <div className="hidden items-center gap-8 lg:flex">
+            <nav className="flex items-center gap-8">
+              {site.nav.map((item) => {
+                const active =
+                  !item.href.includes("#") && pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "text-[16px] transition-opacity hover:opacity-70",
+                      active && "underline underline-offset-[6px]",
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+            <a
+              href={site.repo}
+              target="_blank"
+              rel="noreferrer"
+              className={cn(
+                "inline-flex h-11 items-center rounded-[var(--radius)] px-5 text-[16px] transition-colors",
+                dark
+                  ? "bg-white text-night hover:bg-[#e8e6dc]"
+                  : "bg-night text-on-night hover:bg-night-soft",
+              )}
+            >
+              Get it on GitHub
+            </a>
           </div>
 
           <button
@@ -91,24 +108,18 @@ export function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             onClick={() => setOpen((v) => !v)}
-            className="relative z-50 flex h-10 w-10 cursor-pointer flex-col items-center justify-center gap-1.5 md:hidden"
+            className="relative z-50 flex h-10 w-10 cursor-pointer flex-col items-center justify-center gap-1.5 lg:hidden"
           >
             <span
               className={cn(
-                "block h-0.5 w-6 bg-ink transition-transform duration-300",
-                open && "translate-y-2 rotate-45",
+                "block h-px w-6 bg-current transition-transform duration-300",
+                open && "translate-y-[3.5px] rotate-45",
               )}
             />
             <span
               className={cn(
-                "block h-0.5 w-6 bg-ink transition-opacity duration-200",
-                open && "opacity-0",
-              )}
-            />
-            <span
-              className={cn(
-                "block h-0.5 w-6 bg-ink transition-transform duration-300",
-                open && "-translate-y-2 -rotate-45",
+                "block h-px w-6 bg-current transition-transform duration-300",
+                open && "-translate-y-[3.5px] -rotate-45",
               )}
             />
           </button>

@@ -54,6 +54,12 @@ export function DashboardClient({
   const [now, setNow] = useState<number>(() => Date.now());
   const [busy, setBusy] = useState<null | "activate" | "connect" | "auto">(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // Clock times depend on the viewer's timezone and locale, so they render
+  // only after mount to keep server and client markup identical.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const clock = (iso: string) => (mounted ? formatClock(iso) : "");
+  const dateTime = (iso: string) => (mounted ? formatDateTime(iso) : "");
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Live clock for the countdown.
@@ -171,12 +177,12 @@ export function DashboardClient({
           <div className="flex items-start justify-between gap-4">
             <div>
               <StatusPill tone={windowTone}>{windowLabel}</StatusPill>
-              <h2 className="mt-5 text-5xl font-semibold tracking-tight tabular-nums text-ink md:text-6xl">
+              <h2 className="mt-5 font-serif text-5xl font-normal tracking-[-0.02em] tabular-nums text-ink md:text-6xl">
                 {window.active ? formatCountdown(remainingMs) : "Ready"}
               </h2>
               <p className="mt-2 text-[15px] text-ink-soft">
                 {window.active && window.endsAt
-                  ? `Remaining, ending at ${formatClock(window.endsAt)}`
+                  ? `Remaining, ending at ${clock(window.endsAt)}`
                   : window.availableNow
                     ? "A fresh window is available to start now"
                     : "Waiting for the next window"}
@@ -237,7 +243,7 @@ export function DashboardClient({
           <div className="h-px w-full bg-line" />
           <div className="grid grid-cols-2 gap-6">
             <Stat
-              value={formatClock(window.nextAvailableAt)}
+              value={clock(window.nextAvailableAt)}
               label={window.active ? "Next refresh" : "Available since"}
             />
             <Stat
@@ -264,7 +270,7 @@ export function DashboardClient({
       <Panel className="mt-6 p-7 md:p-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-medium tracking-tight text-ink">
+            <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-ink">
               Today at a glance
             </h2>
             <p className="mt-1 text-[14px] text-ink-soft">
@@ -284,7 +290,7 @@ export function DashboardClient({
       {/* Schedule and history. */}
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.4fr]">
         <Panel className="flex flex-col gap-6 p-7 md:p-8">
-          <h2 className="text-2xl font-medium tracking-tight text-ink">
+          <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-ink">
             How it runs
           </h2>
           <div className="flex flex-col gap-5">
@@ -312,7 +318,7 @@ export function DashboardClient({
         </Panel>
 
         <Panel className="flex flex-col p-7 md:p-8">
-          <h2 className="text-2xl font-medium tracking-tight text-ink">
+          <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-ink">
             Activation history
           </h2>
           {snapshot.activations.length === 0 ? (
@@ -336,7 +342,7 @@ export function DashboardClient({
                   >
                     <div className="min-w-0">
                       <p className="text-[15px] text-ink">
-                        {formatDateTime(record.at)}
+                        {dateTime(record.at)}
                       </p>
                       <p className="mt-0.5 truncate text-[14px] text-ink-soft">
                         {record.detail}

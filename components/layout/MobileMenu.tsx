@@ -107,7 +107,7 @@ export function MobileMenu({
     <div
       ref={overlayRef}
       id="mobile-menu"
-      className="fixed inset-0 z-40 flex flex-col bg-panel md:hidden"
+      className="fixed inset-0 z-40 flex flex-col bg-paper lg:hidden"
       style={{ clipPath: "inset(0 0 100% 0)" }}
       aria-hidden={!open}
     >
@@ -115,9 +115,7 @@ export function MobileMenu({
         <ul ref={itemsRef} className="flex flex-col gap-2">
           {site.nav.map((item) => {
             const active =
-              item.href === "/"
-                ? activePath === "/"
-                : activePath.startsWith(item.href);
+              !item.href.includes("#") && activePath.startsWith(item.href);
             return (
               <li key={item.href}>
                 <Link
@@ -125,8 +123,8 @@ export function MobileMenu({
                   onClick={onClose}
                   className={
                     active
-                      ? "block py-2 text-4xl font-medium tracking-tight text-clay"
-                      : "block py-2 text-4xl font-medium tracking-tight text-ink"
+                      ? "block py-2 font-serif text-4xl text-clay"
+                      : "block py-2 font-serif text-4xl text-ink"
                   }
                 >
                   {item.label}
@@ -140,7 +138,14 @@ export function MobileMenu({
         ref={footerRef}
         className="border-t border-line px-8 py-8 text-[15px] text-ink-soft"
       >
-        <p>Move unused Claude time from sleep into your working day.</p>
+        <a
+          href={site.repo}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex h-12 items-center rounded-[var(--radius)] bg-night px-6 text-[16px] text-on-night"
+        >
+          Get it on GitHub
+        </a>
       </div>
     </div>
   );

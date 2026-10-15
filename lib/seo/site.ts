@@ -21,8 +21,11 @@ export const site = {
     "automatic Claude activation",
     "developer productivity tool",
   ],
+  repo: "https://github.com/zakisheriff/Claude-Lazy-Starter",
   nav: [
-    { label: "Home", href: "/" },
+    { label: "How it works", href: "/#how-it-works" },
+    { label: "Set it up", href: "/#set-it-up" },
+    { label: "Questions", href: "/#questions" },
     { label: "Dashboard", href: "/dashboard" },
     { label: "Settings", href: "/settings" },
   ],

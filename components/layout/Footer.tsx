@@ -2,44 +2,86 @@ import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/seo/site";
 
+const columns = [
+  {
+    title: "Product",
+    links: [
+      { label: "How it works", href: "/#how-it-works" },
+      { label: "Set it up", href: "/#set-it-up" },
+      { label: "Dashboard", href: "/dashboard" },
+      { label: "Settings", href: "/settings" },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      { label: "Questions", href: "/#questions" },
+      { label: "Source code", href: site.repo },
+      { label: "Claude Code", href: "https://docs.claude.com/en/docs/claude-code/overview" },
+      { label: "Claude plans", href: "https://claude.com/pricing" },
+    ],
+  },
+  {
+    title: "Project",
+    links: [
+      { label: "The Atom", href: "https://theatom.lk" },
+      { label: "Report an issue", href: `${site.repo}/issues` },
+    ],
+  },
+] as const;
+
+function FooterLink({ href, label }: { href: string; label: string }) {
+  const external = href.startsWith("http");
+  const className =
+    "text-[15px] text-on-night-soft transition-colors hover:text-on-night";
+  return external ? (
+    <a href={href} target="_blank" rel="noreferrer" className={className}>
+      {label}
+    </a>
+  ) : (
+    <Link href={href} className={className}>
+      {label}
+    </Link>
+  );
+}
+
 export function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="border-t border-line bg-panel">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-16 lg:flex-row lg:items-start lg:justify-between lg:px-8">
-        <div className="max-w-sm">
-          <div className="flex items-center gap-2.5">
+    <footer className="bg-night text-on-night">
+      <div className="mx-auto grid max-w-[1400px] gap-14 px-6 pt-24 pb-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-16">
+        <div className="flex flex-col justify-between gap-10">
+          <Link href="/" className="flex items-center gap-3">
             <Image
               src="/logo.png"
               alt=""
-              width={30}
-              height={30}
-              className="h-7 w-7 rounded-[7px]"
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-[8px]"
             />
-            <p className="text-[17px] font-semibold text-ink">{site.name}</p>
-          </div>
-          <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">
-            {site.tagline} A personal tool that starts your refreshed window
-            while you sleep, so the time is yours when you wake up.
-          </p>
+            <span className="text-[18px] font-medium">{site.name}</span>
+          </Link>
         </div>
 
-        <nav className="flex flex-col gap-3">
-          {site.nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-[15px] text-ink-soft transition-colors hover:text-ink"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        {columns.map((col) => (
+          <nav key={col.title} aria-label={col.title}>
+            <p className="text-[15px] font-semibold">{col.title}</p>
+            <ul className="mt-6 flex flex-col gap-4">
+              {col.links.map((l) => (
+                <li key={l.label}>
+                  <FooterLink href={l.href} label={l.label} />
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
       </div>
-      <div className="mx-auto max-w-6xl px-6 pb-10 lg:px-8">
-        <p className="text-[13px] text-ink-soft">
-          {site.name}. Copyright {year}. Built as a personal productivity tool
-          for your own Claude account.
+
+      <div className="mx-auto flex max-w-[1400px] flex-col gap-2 px-6 pb-14 text-[14px] text-on-night-soft lg:flex-row lg:justify-between lg:px-16">
+        <p>Copyright {year} {site.name}</p>
+        <p>
+          An independent open source project. Not affiliated with or endorsed by
+          Anthropic.
         </p>
       </div>
     </footer>

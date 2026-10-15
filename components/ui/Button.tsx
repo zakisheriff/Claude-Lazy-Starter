@@ -5,21 +5,20 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "md" | "lg";
 
 const base =
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full font-medium transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none select-none";
+  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-[var(--radius)] font-normal transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none select-none";
 
 const variants: Record<Variant, string> = {
-  primary:
-    "bg-clay text-white hover:bg-[color-mix(in_srgb,var(--clay)_88%,black)]",
+  primary: "bg-ink text-paper hover:opacity-85",
   secondary:
-    "bg-panel-strong text-ink hover:bg-[color-mix(in_srgb,var(--panel-strong)_80%,var(--ink)_6%)] border border-line-strong",
+    "border border-line-strong bg-transparent text-ink hover:bg-panel",
   ghost: "text-ink hover:bg-panel",
   danger:
     "bg-transparent text-danger border border-[color-mix(in_srgb,var(--danger)_45%,transparent)] hover:bg-[color-mix(in_srgb,var(--danger)_10%,transparent)]",
 };
 
 const sizes: Record<Size, string> = {
-  md: "h-10 px-5 text-[15px]",
-  lg: "h-12 px-7 text-base",
+  md: "h-11 px-5 text-[15px]",
+  lg: "h-12 px-6 text-[16px]",
 };
 
 type CommonProps = {

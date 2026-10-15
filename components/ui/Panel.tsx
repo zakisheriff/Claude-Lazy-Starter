@@ -18,7 +18,7 @@ export function Panel({
   return (
     <Tag
       className={cn(
-        "rounded-[var(--radius)] border border-line bg-paper-raised",
+        "rounded-[var(--radius-sm)] border border-line bg-paper-raised",
         raised && "shadow-[var(--shadow-soft)]",
         className,
       )}

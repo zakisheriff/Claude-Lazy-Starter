@@ -6,81 +6,73 @@
   Light and dark are both first class.
 */
 
-:root {
-  --paper: #f7f5ef;
-  --paper-raised: #fbfaf5;
-  --panel: #f0ede4;
-  --panel-strong: #eae6da;
-  --ink: #211f1b;
-  --ink-soft: #6b675f;
-  --ink-faint: #96918663;
-  --line: #e5e1d6;
-  --line-strong: #d8d3c5;
-  --clay: #c15f3c;
-  --clay-soft: #d98c6f;
-  --clay-wash: #f3e6df;
-  --positive: #4a7a54;
-  --warning: #b07a2b;
-  --danger: #b04a3c;
+/*
+  Editorial palette: ivory paper, slate ink, clay accent. Serif for reading
+  and display, sans for interface, mono for code.
+*/
 
-  --radius: 14px;
-  --radius-sm: 10px;
-  --radius-lg: 22px;
-  --shadow-soft: 0 1px 2px rgba(33, 31, 27, 0.04),
-    0 8px 30px rgba(33, 31, 27, 0.05);
-  --shadow-raised: 0 1px 2px rgba(33, 31, 27, 0.05),
-    0 18px 50px rgba(33, 31, 27, 0.08);
+:root {
+  --paper: #faf9f5;
+  --paper-raised: #ffffff;
+  --panel: #f0eee6;
+  --panel-strong: #e8e6dc;
+  --ink: #141413;
+  --ink-soft: #5e5d59;
+  --ink-muted: #87867f;
+  --ink-faint: #b0aea5;
+  --line: #d1cfc5;
+  --line-strong: #141413;
+  --clay: #d97757;
+  --clay-soft: #e3a58d;
+  --clay-wash: #ebc9b7;
+  --night: #141413;
+  --night-soft: #262624;
+  --on-night: #faf9f5;
+  --on-night-soft: #b0aea5;
+  --positive: #788c5d;
+  --warning: #b07a2b;
+  --danger: #bf4d43;
+
+  --radius: 8px;
+  --radius-sm: 6px;
+  --radius-lg: 12px;
+  --shadow-soft: none;
+  --shadow-raised: 0 1px 2px rgba(20, 20, 19, 0.06);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #1e1d1a;
-    --paper-raised: #24221e;
-    --panel: #26241f;
-    --panel-strong: #2c2a24;
-    --ink: #ece8df;
-    --ink-soft: #a39d90;
-    --ink-faint: #6b675f66;
-    --line: #322f29;
-    --line-strong: #3d3a33;
-    --clay: #cf7354;
-    --clay-soft: #b96b50;
-    --clay-wash: #35271f;
-    --positive: #6fa377;
+  :root:not([data-theme="light"]) {
+    --paper: #1a1918;
+    --paper-raised: #1f1e1d;
+    --panel: #262624;
+    --panel-strong: #30302e;
+    --ink: #faf9f5;
+    --ink-soft: #b0aea5;
+    --ink-muted: #87867f;
+    --ink-faint: #5e5d59;
+    --line: #3d3d3a;
+    --line-strong: #87867f;
+    --clay: #d97757;
+    --clay-soft: #b5654a;
+    --clay-wash: #4a2f24;
+    --positive: #9bb07f;
     --warning: #cc9a4f;
-    --danger: #cf7d6f;
-    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.25),
-      0 8px 30px rgba(0, 0, 0, 0.28);
-    --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.3),
-      0 18px 50px rgba(0, 0, 0, 0.4);
+    --danger: #e07a70;
   }
 }
 
-:root[data-theme="light"] {
-  --paper: #f7f5ef;
-  --paper-raised: #fbfaf5;
-  --panel: #f0ede4;
-  --panel-strong: #eae6da;
-  --ink: #211f1b;
-  --ink-soft: #6b675f;
-  --line: #e5e1d6;
-  --line-strong: #d8d3c5;
-  --clay: #c15f3c;
-  --clay-wash: #f3e6df;
-  color-scheme: light;
-}
-
 :root[data-theme="dark"] {
-  --paper: #1e1d1a;
-  --paper-raised: #24221e;
-  --panel: #26241f;
-  --panel-strong: #2c2a24;
-  --ink: #ece8df;
-  --ink-soft: #a39d90;
-  --line: #322f29;
-  --line-strong: #3d3a33;
-  --clay: #cf7354;
-  --clay-wash: #35271f;
+  --paper: #1a1918;
+  --paper-raised: #1f1e1d;
+  --panel: #262624;
+  --panel-strong: #30302e;
+  --ink: #faf9f5;
+  --ink-soft: #b0aea5;
+  --ink-muted: #87867f;
+  --ink-faint: #5e5d59;
+  --line: #3d3d3a;
+  --line-strong: #87867f;
+  --clay-wash: #4a2f24;
   color-scheme: dark;
 }
 
@@ -91,17 +83,26 @@
   --color-panel-strong: var(--panel-strong);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
   --color-clay: var(--clay);
   --color-clay-soft: var(--clay-soft);
   --color-clay-wash: var(--clay-wash);
+  --color-night: var(--night);
+  --color-night-soft: var(--night-soft);
+  --color-on-night: var(--on-night);
+  --color-on-night-soft: var(--on-night-soft);
   --color-positive: var(--positive);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
 
   --font-sans: var(--font-inter), system-ui, "Helvetica Neue", Helvetica,
     Arial, sans-serif;
+  --font-serif: var(--font-source-serif), "Tiempos Text", Georgia, serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", Menlo,
+    monospace;
 
   --radius-panel: var(--radius);
   --radius-panel-sm: var(--radius-sm);
@@ -118,13 +119,10 @@ html {
 }
 
 body {
-  /* One warm background everywhere, matching the footer. No near white
-     sections; only cards lift above this surface. */
-  background-color: var(--panel);
+  background-color: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
   font-feature-settings: "cv05" 1, "ss01" 1;
-  letter-spacing: -0.011em;
 }
 
 /* Every text input uses a 16px font size, everywhere. */
@@ -174,4 +172,109 @@ html.lenis body {
    when JavaScript is unavailable, content stays fully visible. */
 [data-reveal] {
   opacity: 1;
+}
+
+/* Reading column, used by the long form landing article. */
+.prose-article p {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  line-height: 1.65;
+  color: var(--ink);
+  margin-top: 1.35em;
+}
+
+.prose-article p:first-child {
+  margin-top: 0;
+}
+
+.prose-article a,
+.link-underline {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+
+.prose-article a:hover,
+.link-underline:hover {
+  color: var(--clay);
+}
+
+.prose-article strong {
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .prose-article p {
+    font-size: 18px;
+  }
+}
+
+/* Dotted leader between a number and a title, as in a table of contents. */
+.leader {
+  flex: 1;
+  margin: 0 10px;
+  border-bottom: 1px dotted currentColor;
+  opacity: 0.45;
+  transform: translateY(-4px);
+}
+
+/* Fine film grain over the hero sky. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Workflow film: drifting sleep z's and a slim scrubber. */
+@keyframes film-z {
+  0% {
+    opacity: 0;
+    transform: translate(0, 6px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, -14px);
+  }
+}
+
+.film-z {
+  animation: film-z 2.4s ease-out infinite;
+}
+
+.film-z-2 {
+  animation-delay: 0.8s;
+}
+
+.film-z-3 {
+  animation-delay: 1.6s;
+}
+
+.film-scrub {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+}
+
+.film-scrub::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #f2ede4;
+}
+
+.film-scrub::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #f2ede4;
 }

@@ -6,7 +6,7 @@ export const faq = [
   {
     question: "What does Claude Lazy Starter actually do?",
     answer:
-      "It watches for the moment your Claude usage window refreshes and starts a session for you by sending a short message. Because a window only begins once you send something, starting it early means the five hour clock runs during hours you were not going to use anyway.",
+      "Once an hour it sends a short Hi to Claude on your behalf. If your usage window has ended, that starts the next one. Because a window only begins once you send something, starting it early means the five hour clock runs during hours you were not going to use anyway.",
   },
   {
     question: "Why would I want my window to start while I sleep?",
@@ -19,13 +19,28 @@ export const faq = [
       "No. It sends one short message through Claude Code, the official Claude command line tool, signed in with your own subscription. Claude Code and the Claude app share the same usage window, so that one line starts your window everywhere. Nothing else is sent and your work never leaves your account.",
   },
   {
-    question: "Is my account information stored anywhere?",
+    question: "Where is my token kept?",
     answer:
-      "This build is single tenant and runs against your own account. Your settings and activation history are stored locally. A real session is kept on your own machine, never handed to a third party server.",
+      "Only in your own GitHub repository, as an encrypted Actions secret. This site never sees it, and there is no shared server holding anyone's account. Each person runs their own copy.",
   },
   {
-    question: "Can I control when it activates?",
+    question: "Does the hourly message use up my limit?",
     answer:
-      "It is intentionally simple. With automatic activation on, it starts a fresh window the moment the last one ends, so a window is always running. You can change the short activation message, turn automatic activation off, and start a window by hand from the dashboard whenever you like.",
+      "Barely. Each run sends a single Hi on Haiku, the smallest model, which is a tiny slice of a window. If a window is already running the message simply uses a sliver of it; nothing resets.",
+  },
+  {
+    question: "Why every hour instead of the exact moment?",
+    answer:
+      "The workflow cannot see when your window ends, so it checks in every hour. That means a fresh window starts at most about an hour after the last one ends, while keeping the number of messages low.",
+  },
+  {
+    question: "Can I change the message or turn it off?",
+    answer:
+      "Yes. Set the LAZY_MESSAGE and LAZY_MODEL repository variables to change what is sent, or disable the Lazy start workflow from the Actions tab to pause it at any time.",
+  },
+  {
+    question: "Is this made by Anthropic?",
+    answer:
+      "No. Claude Lazy Starter is an independent open source project. It only uses Claude Code, the official command line tool, with your own subscription.",
   },
 ] as const;
