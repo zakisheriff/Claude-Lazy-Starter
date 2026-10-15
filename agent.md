@@ -65,7 +65,8 @@ website. The source repository is private, so the site never links to it.
 ## Design surface
 
 - Ivory `--paper` on `body`. The hero and the footer are dark. The navbar shows
-  the name only (no logo), transparent over the hero and ivory after it.
+  the name only (no logo) in the serif, matching the footer wordmark. It is
+  transparent over the hero and solid ivory (no blur) after it.
 - Tokens live in `app/globals.css`; `.prose-article` sets the serif reading
   column. Smooth anchor scrolling is plain CSS; there is no Lenis.
 

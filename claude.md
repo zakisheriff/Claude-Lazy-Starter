@@ -63,4 +63,4 @@ The source repository is private; the site never links to it.
 - Respect reduced motion everywhere; keep animation subtle outside the film.
 - After every completed change, update `agent.md` and `claude.md`, then commit
   with a conventional message and no co author or Claude trailer. Push only
-  when the owner approves.
+  when the owner approves. The repository is public under the MIT license.
