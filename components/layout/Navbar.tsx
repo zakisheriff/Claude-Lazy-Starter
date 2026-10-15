@@ -48,13 +48,13 @@ export function Navbar() {
           "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
           dark
             ? "bg-transparent text-on-night"
-            : "border-b border-line bg-paper/90 text-ink backdrop-blur-md",
+            : "border-b border-line bg-paper text-ink",
         )}
       >
         <div className="mx-auto flex h-[68px] max-w-[1400px] items-center justify-between px-6 lg:px-16">
           <Link
             href="/"
-            className="text-[17px] font-medium tracking-[-0.01em]"
+            className="font-serif text-[22px] leading-none tracking-[-0.02em]"
           >
             {site.name}
           </Link>
