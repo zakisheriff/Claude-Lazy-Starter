@@ -50,9 +50,14 @@ There are no sleep or working hours to configure.
 
 - Home: a long form article. Dark horizon hero with a numbered contents list,
   introduction, how it works (an animated workflow film, before and after
-  timelines, a comparison table, an hour by hour night), set it up (four steps
-  with copyable commands), questions, closing call to action. A section rail
-  on the left tracks progress on wide screens.
+  timelines, a comparison table, an hour by hour night), set it up (five steps:
+  create a private repo, paste the workflow, create a token, save the secret,
+  run it once), questions, closing call to action. A section rail on the left
+  tracks progress on wide screens.
+- The source repository is private, so the site never links to it or asks
+  visitors to fork. The setup section reads `.github/workflows/lazy-start.yml`
+  at build time and shows it with a copy button; visitors paste it into their
+  own private repository. Edit that file and the page follows.
 - Workflow film (`components/home/film`): a low poly room built in code with
   three.js, loaded lazily on the client. `story.ts` is the pure script (clock,
   captions, terminal lines, bars); `WorkflowFilm.tsx` renders the scene and

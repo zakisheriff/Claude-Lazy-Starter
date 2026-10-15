@@ -47,8 +47,12 @@ other user's session is ever stored.
 
 - Landing page as a long form article: horizon hero, introduction, how it
   works with an animated three.js workflow film (`components/home/film`),
-  before and after timelines, a comparison table, the four setup steps, and
+  before and after timelines, a comparison table, the five setup steps, and
   questions.
+- Setup without the source repo: the repository is private, so the site never
+  links to it. Visitors create their own private repository and paste the
+  workflow, which the page reads from `.github/workflows/lazy-start.yml` at
+  build time and shows with a copy button.
 - Dashboard: live window status, remaining countdown, next refresh, activation
   status and reason, automatic activation toggle, connect and disconnect,
   activate now, daily usage timeline, activation history.
