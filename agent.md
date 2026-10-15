@@ -25,9 +25,15 @@ other user's session is ever stored.
   `FileStore` is a file backed implementation under `.data`. Swap it for a
   database without touching the domain or UI.
 - `lib/automation` is the automation boundary. `ActivationDriver` is the
-  interface. Two implementations: `SimulatedDriver` (default, touches nothing)
-  and `PlaywrightDriver` (real, drives claude.ai with a captured session).
-  Selected by `LAZY_DRIVER`. Both are interchangeable.
+  interface. Three implementations, selected by `LAZY_DRIVER`:
+  `SimulatedDriver` (default, touches nothing), `ClaudeCodeDriver`
+  (recommended real driver, sends through `claude -p`, which shares the five
+  hour window with claude.ai on Pro and Max), and `PlaywrightDriver` (legacy,
+  drives the claude.ai page with a captured session). All are interchangeable.
+- `.github/workflows/lazy-start.yml` is the zero server path: an hourly GitHub
+  Actions job that sends "Hi" on Haiku with `CLAUDE_CODE_OAUTH_TOKEN` (from
+  `claude setup-token`), so a window starts within an hour of the last one
+  ending, even while the user's computer sleeps.
 - `lib/scheduler` runs a single in process interval, started from
   `instrumentation.ts`. The rule is simple: the moment a window ends and a fresh
   one is available, it opens it, so a window is always running. Idempotent per
@@ -45,7 +51,9 @@ other user's session is ever stored.
   activate now, daily usage timeline, activation history.
 - Settings: intentionally small. Automatic activation on or off, the activation
   message (default "Hi"), and window length. Persisted to the store.
-- Real automation path: `PlaywrightDriver`, a one time session capture script
+- Real automation path: `ClaudeCodeDriver` plus the hourly `lazy-start`
+  GitHub Actions workflow (recommended).
+- Legacy real automation path: `PlaywrightDriver`, a one time session capture script
   (`npm run capture-session`), a guarded upload (`npm run upload-session` and
   `POST /api/session` with `ADMIN_TOKEN`), and a Dockerfile plus `render.yaml`
   to deploy on an always on host with a persistent disk.
@@ -65,8 +73,9 @@ other user's session is ever stored.
 
 ## Future improvements
 
-- Harden the Playwright driver against claude.ai bot detection and selector
-  changes (real browser under a virtual display, richer confirmation checks).
+- Let the web app read real window state (for example from Claude Code usage
+  output) instead of estimating it from the last activation.
+- Retire the Playwright driver once the Claude Code path has proven itself.
 - Durable scheduler (a job runner) in place of the in process interval.
 - Notifications when a window is opened or a session expires.
 - A small in app flow to capture and upload the session, instead of the script.

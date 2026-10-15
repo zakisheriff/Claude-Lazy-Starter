@@ -16,7 +16,7 @@ export const faq = [
   {
     question: "Does this use the Claude API?",
     answer:
-      "No. It works with your own Claude web account through browser automation. Nothing here calls the API or sends your work anywhere; the activation message is a single short line to open the session.",
+      "No. It sends one short message through Claude Code, the official Claude command line tool, signed in with your own subscription. Claude Code and the Claude app share the same usage window, so that one line starts your window everywhere. Nothing else is sent and your work never leaves your account.",
   },
   {
     question: "Is my account information stored anywhere?",

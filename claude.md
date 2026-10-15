@@ -11,10 +11,13 @@ message, so a window that refreshes overnight is wasted if you do not touch it
 until midday. The app starts the window for you at refresh time.
 
 Single tenant by design: you connect your own account. The app never stores
-anyone else's Claude session. It ships with a simulated driver (default) and a
-real Playwright driver, chosen by `LAZY_DRIVER`. The real driver must run on an
-always on host (a laptop that sleeps cannot fire overnight); see README for the
-Render deployment and the session capture flow.
+anyone else's Claude session. It ships with a simulated driver (default), a
+recommended Claude Code driver that sends through `claude -p` (Claude Code
+shares the five hour window with claude.ai on Pro and Max), and a legacy
+Playwright driver, chosen by `LAZY_DRIVER`. The zero server path is the hourly
+GitHub Actions workflow in `.github/workflows/lazy-start.yml`, authenticated by
+a `CLAUDE_CODE_OAUTH_TOKEN` secret from `claude setup-token`; it fires even
+while the user's laptop sleeps. See README.
 
 Core behaviour is deliberately simple: with automatic activation on, the moment
 one window ends a fresh one is started by sending a short message (default "Hi"),
@@ -29,8 +32,9 @@ There are no sleep or working hours to configure.
 - Layers:
   - `lib/domain`: pure window, schedule, and decision logic.
   - `lib/store`: `Repository` interface and a file backed store under `.data`.
-  - `lib/automation`: `ActivationDriver` interface, the simulated and Playwright
-    drivers, and a shared `runActivation` service.
+  - `lib/automation`: `ActivationDriver` interface, the simulated, Claude Code,
+    and Playwright drivers, and a shared `runActivation` service.
+  - `.github/workflows/lazy-start.yml`: hourly cloud ping through Claude Code.
   - `lib/scheduler`: in process interval started by `instrumentation.ts` that
     starts a fresh window as soon as one is available.
   - `app/api`: activation, scheduler, connection, settings, and the guarded
@@ -54,7 +58,8 @@ There are no sleep or working hours to configure.
 
 ## Future improvements
 
-- Harden the Playwright driver against bot detection and selector drift.
+- Read real window state instead of estimating it from the last activation.
+- Retire the Playwright driver once the Claude Code path has proven itself.
 - Durable job based scheduler in place of the in process interval.
 - Activation and expiry notifications.
 - In app session capture and upload, instead of the script.
