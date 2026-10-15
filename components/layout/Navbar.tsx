@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { site } from "@/lib/seo/site";
@@ -55,16 +54,8 @@ export function Navbar() {
         <div className="mx-auto flex h-[68px] max-w-[1400px] items-center justify-between px-6 lg:px-16">
           <Link
             href="/"
-            className="flex items-center gap-2.5 text-[17px] font-medium tracking-[-0.01em]"
+            className="text-[17px] font-medium tracking-[-0.01em]"
           >
-            <Image
-              src="/logo.png"
-              alt=""
-              width={28}
-              height={28}
-              priority
-              className="h-7 w-7 rounded-[6px]"
-            />
             {site.name}
           </Link>
 

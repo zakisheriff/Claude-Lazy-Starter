@@ -10,9 +10,14 @@ import { useState } from "react";
 export function CodeBlock({
   code,
   filename,
+  copyLabel = "Copy",
+  wrap = false,
 }: {
   code: string;
   filename?: string;
+  copyLabel?: string;
+  /** Wrap long lines instead of scrolling sideways, for prose like prompts. */
+  wrap?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -33,7 +38,7 @@ export function CodeBlock({
       className="shrink-0 cursor-pointer text-[14px] text-ink-soft transition-colors hover:text-ink"
       aria-label={filename ? `Copy ${filename}` : `Copy ${code}`}
     >
-      {copied ? "Copied" : "Copy"}
+      {copied ? "Copied" : copyLabel}
     </button>
   );
 
@@ -41,12 +46,16 @@ export function CodeBlock({
     return (
       <div className="mt-5 overflow-hidden rounded-[var(--radius-sm)] border border-line bg-panel">
         <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-3">
-          <code className="min-w-0 truncate font-mono text-[13px] text-ink-soft">
+          <span className="min-w-0 truncate text-[14px] text-ink-soft">
             {filename}
-          </code>
+          </span>
           {button}
         </div>
-        <pre className="max-h-[360px] overflow-auto px-5 py-4 font-mono text-[13px] leading-relaxed text-ink">
+        <pre
+          className={`max-h-[420px] overflow-auto px-5 py-4 font-mono text-[13px] leading-relaxed text-ink ${
+            wrap ? "break-words whitespace-pre-wrap" : ""
+          }`}
+        >
           <code>{code}</code>
         </pre>
       </div>

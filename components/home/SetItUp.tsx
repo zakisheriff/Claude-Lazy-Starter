@@ -4,118 +4,66 @@ import Reveal from "@/components/motion/Reveal";
 import { CodeBlock } from "@/components/ui/CodeBlock";
 import { ArticleSection, Prose } from "./Article";
 
-const WORKFLOW_PATH = ".github/workflows/lazy-start.yml";
+/** The workflow, read from the real file at build time so the prompt and the
+ *  workflow in this repository can never drift apart. */
+const workflow = readFileSync(
+  path.join(process.cwd(), ".github/workflows/lazy-start.yml"),
+  "utf8",
+).trim();
 
-/** The workflow a reader pastes into their own repository. Read from the real
- *  file at build time so the page and the workflow can never drift apart. */
-const workflow = readFileSync(path.join(process.cwd(), WORKFLOW_PATH), "utf8");
+/** One prompt that has Claude Code set everything up. The token is created
+ *  and saved by the reader in their own terminal, never pasted into chat. */
+const prompt = `Set up Claude Lazy Starter for me. It keeps my Claude usage window running by sending a tiny "Hi" through Claude Code once an hour from GitHub Actions, so a fresh five hour window starts even while I sleep.
 
-const inlineCode =
-  "rounded-[4px] bg-panel px-1.5 py-0.5 font-mono text-[15px] text-ink";
+Work through these steps one at a time and tell me what you are doing:
 
-type Step = {
-  title: string;
-  body: React.ReactNode;
-  code?: string;
-  file?: { name: string; code: string };
-  action?: { label: string; href: string };
-};
+1. Check that the GitHub CLI (gh) is installed and logged in. If it is missing, install it (brew install gh on macOS, otherwise follow cli.github.com). If it is not logged in, ask me to run gh auth login in my own terminal and wait for me.
 
-const steps: Step[] = [
-  {
-    title: "Create a private repository",
-    body: "On GitHub, create a new private repository with any name. It holds a single file, and it lives in your own account, so nobody else ever sees your token.",
-    action: { label: "New repository", href: "https://github.com/new" },
-  },
-  {
-    title: "Add the workflow",
-    body: (
-      <>
-        In that repository choose Add file, then Create new file. Name it{" "}
-        <code className={inlineCode}>{WORKFLOW_PATH}</code>, paste the workflow
-        below, and commit it.
-      </>
-    ),
-    file: { name: WORKFLOW_PATH, code: workflow },
-  },
-  {
-    title: "Create a token",
-    body: "On your computer, with Claude Code installed, run the command below. Sign in when the browser opens, then copy the token it prints. It lasts a year.",
-    code: "claude setup-token",
-  },
-  {
-    title: "Save it as a secret",
-    body: (
-      <>
-        In your repository open Settings, then Secrets and variables, then
-        Actions. Add a repository secret named{" "}
-        <code className={inlineCode}>CLAUDE_CODE_OAUTH_TOKEN</code> and paste
-        the token.
-      </>
-    ),
-  },
-  {
-    title: "Run it once",
-    body: "Open the Actions tab, choose Lazy start, and press Run workflow to check it. From then on it runs every hour by itself.",
-  },
-];
+2. Create a new private GitHub repository named claude-lazy-starter in my account and clone it into a temporary folder.
+
+3. In that repository create the file .github/workflows/lazy-start.yml with exactly this content, then commit and push it:
+
+\`\`\`yaml
+${workflow}
+\`\`\`
+
+4. Ask me to open a separate terminal window, run claude setup-token, and finish the sign in. Do not ask me to paste the token into this chat.
+
+5. Ask me to run this in that same terminal, replacing OWNER with my GitHub username, and to paste the token when it prompts:
+gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo OWNER/claude-lazy-starter
+Wait until I confirm it is done.
+
+6. Start the workflow once with gh workflow run lazy-start.yml, follow it with gh run watch, and tell me whether it succeeded. If it failed, read the logs with gh run view --log-failed, explain the problem, and help me fix it.
+
+7. Finish by giving me the repository link and confirming it will now run every hour on its own.`;
 
 export function SetItUp() {
   return (
     <ArticleSection id="set-it-up" title="Set it up">
       <Prose className="mt-10">
         <p>
-          Setup takes about three minutes and happens once. You need a Claude
-          Pro or Max plan, a free GitHub account, and Claude Code on your
-          computer for the one command below.
+          You need a Claude Pro or Max plan, a free GitHub account, and Claude
+          Code. Open Claude Code in any folder, paste the prompt below, and
+          follow along. Claude creates a private repository, adds the workflow,
+          and runs it once to check. You save your token yourself, so it never
+          passes through the chat.
         </p>
       </Prose>
 
-      <Reveal className="mx-auto mt-14 w-full max-w-[800px]">
-        <ol className="border-t border-line-strong">
-          {steps.map((step, i) => (
-            <li
-              key={step.title}
-              className="grid gap-3 border-b border-line py-9 md:grid-cols-[72px_1fr] md:gap-6"
-            >
-              <span className="font-mono text-[14px] text-ink-soft">
-                ({i + 1})
-              </span>
-              <div className="min-w-0">
-                <h3 className="font-serif text-[25px] leading-tight text-ink">
-                  {step.title}
-                </h3>
-                <p className="mt-3 font-serif text-[18px] leading-relaxed text-ink-soft">
-                  {step.body}
-                </p>
-                {step.code ? <CodeBlock code={step.code} /> : null}
-                {step.file ? (
-                  <CodeBlock code={step.file.code} filename={step.file.name} />
-                ) : null}
-                {step.action ? (
-                  <a
-                    href={step.action.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-6 inline-flex h-11 items-center rounded-[var(--radius)] bg-ink px-5 text-[15px] text-paper transition-opacity hover:opacity-85"
-                  >
-                    {step.action.label}
-                  </a>
-                ) : null}
-              </div>
-            </li>
-          ))}
-        </ol>
+      <Reveal className="mx-auto mt-10 w-full max-w-[800px]">
+        <CodeBlock
+          code={prompt}
+          filename="Paste into Claude Code"
+          copyLabel="Copy prompt"
+          wrap
+        />
       </Reveal>
 
-      <Prose className="mt-14">
+      <Prose className="mt-10">
         <p>
-          You can change the message or the model with repository variables
-          named LAZY_MESSAGE and LAZY_MODEL. The defaults are Hi and Haiku, the
-          smallest model, so each run uses as little of your window as possible.
-          Prefer to watch it work? The{" "}
-          <a href="/dashboard">dashboard</a> can run the same activation from
-          any always on machine.
+          That is all. From then on it runs every hour by itself. The prompt
+          includes the full workflow, so you can read exactly what will run
+          before you paste it.
         </p>
       </Prose>
     </ArticleSection>

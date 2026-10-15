@@ -141,7 +141,7 @@ export function MobileMenu({
         <Link
           href="/#set-it-up"
           onClick={onClose}
-          className="inline-flex h-12 items-center rounded-[var(--radius)] bg-night px-6 text-[16px] text-on-night"
+          className="flex h-14 w-full items-center justify-center rounded-[var(--radius)] bg-night text-[18px] font-medium text-on-night"
         >
           Set it up
         </Link>
