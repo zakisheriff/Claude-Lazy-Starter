@@ -51,9 +51,16 @@ website. The source repository is private, so the site never links to it.
   over the shoulder screen shot, with a separate framing for tall screens.
 - Before and after timelines, a comparison table, an hour by hour night.
 - Setup: one prompt for Claude Code with a copy button.
-- Questions, closing call to action, dark footer.
-- Full SEO, AEO, and GEO: metadata, Open Graph, JSON-LD (SoftwareApplication,
-  WebSite, Organization, FAQPage, HowTo), robots, sitemap.
+- Questions, closing call to action.
+- Footer: a full viewport dark closing page, no logo. Link columns, a centered
+  one line serif wordmark, and the credit "built by The Atom" (theatom.lk).
+- SEO, AEO, GEO: `lib/seo/site.ts` is the source of truth (title, description,
+  quotable summary, keywords, builder). JSON-LD is one linked graph by @id:
+  Organization (The Atom), WebSite, WebPage with speakable sections,
+  SoftwareApplication, HowTo for the one prompt setup, FAQPage. Metadata names
+  The Atom as author and publisher. `/llms.txt` is generated from the same
+  config and FAQ. `robots.ts` allows search and AI crawlers. Share images
+  (`app/opengraph-image.jpg`, `app/twitter-image.jpg`) are cut from the hero.
 
 ## Design surface
 

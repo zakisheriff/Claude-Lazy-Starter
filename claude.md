@@ -40,7 +40,12 @@ The source repository is private; the site never links to it.
   sunrise, wake and stretch, work to 90 percent usage, reset to 0 percent at
   8:07 am (+5 hours, celebration). Wide and over the shoulder cameras.
 - Timelines, comparison table, hour by hour night, one prompt setup, questions.
-- SEO, AEO, GEO fully configured.
+- Full viewport footer with a centered wordmark and the credit to The Atom
+  (theatom.lk), who builds Claude Lazy Starter.
+- SEO, AEO, GEO: linked JSON-LD graph (Organization The Atom, WebSite, WebPage
+  with speakable, SoftwareApplication, HowTo, FAQPage), metadata with The Atom
+  as author and publisher, generated `/llms.txt`, robots that allow AI
+  crawlers, hero cut share images. Source of truth is `lib/seo/site.ts`.
 
 ## Future improvements
 

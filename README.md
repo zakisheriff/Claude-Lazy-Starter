@@ -1,5 +1,7 @@
 # Claude Lazy Starter
 
+Built by [The Atom](https://theatom.lk).
+
 A Claude usage window lasts five hours and only starts when you send your first
 message. If your limit resets at 3:00 am while you sleep, those hours are gone.
 Claude Lazy Starter sends one tiny "Hi" through Claude Code every hour from
