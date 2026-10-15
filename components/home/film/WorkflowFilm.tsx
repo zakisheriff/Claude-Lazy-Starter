@@ -3,38 +3,50 @@
 import { useEffect, useRef, useState } from "react";
 import type * as THREE_NS from "three";
 import { prefersReducedMotion } from "@/lib/utils/motion";
+import { SCREEN_H, SCREEN_W, drawScreen } from "./screen";
 import {
   FILM_LENGTH,
-  awake,
+  asleep,
+  botCheer,
+  botReturning,
+  botStomp,
   botTravel,
-  botTyping,
   captions,
+  celebrate,
   clockHours,
   daylight,
-  firstWindow,
   formatClock,
-  screenGlow,
-  secondWindow,
-  terminalLines,
+  hoursUnlocked,
+  pops,
+  screenBrightness,
+  screenShot,
+  stretch,
+  typing,
+  usage,
+  WINDOW_TWO_AT,
 } from "./story";
 
 type Three = typeof THREE_NS;
 
 /**
- * The workflow film. A low poly room drawn entirely in code with three.js: a
- * sleeper at a desk, a small clay helper bot that sends the Hi at 3:07 am, a
- * window that turns from night to morning, and a wall clock. HTML overlays
- * carry the captions, the live terminal, and the usage window bars, all driven
- * by one film clock from story.ts so everything stays in sync.
+ * The workflow film. A low poly room drawn in code with three.js: a developer
+ * at his laptop, a small Claude bot on the desk, a window that turns from
+ * night to morning, and a laptop screen that shows the real story (the usage
+ * limit, the 3:07 am Hi, the morning session). HTML overlays carry captions,
+ * the clock, the hours unlocked, and the usage bars, all driven by one film
+ * clock from story.ts.
  */
 export function WorkflowFilm() {
   const mountRef = useRef<HTMLDivElement>(null);
   const captionRef = useRef<HTMLParagraphElement>(null);
   const clockRef = useRef<HTMLSpanElement>(null);
-  const bar1Ref = useRef<HTMLDivElement>(null);
-  const bar2Ref = useRef<HTMLDivElement>(null);
-  const bar2WrapRef = useRef<HTMLDivElement>(null);
-  const linesRef = useRef<HTMLDivElement>(null);
+  const unlockedRef = useRef<HTMLSpanElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+  const popTextRef = useRef<HTMLParagraphElement>(null);
+  const popSubRef = useRef<HTMLParagraphElement>(null);
+  const usageBarRef = useRef<HTMLDivElement>(null);
+  const usageLabelRef = useRef<HTMLParagraphElement>(null);
+  const usagePctRef = useRef<HTMLParagraphElement>(null);
   const zRef = useRef<HTMLDivElement>(null);
   const scrubRef = useRef<HTMLInputElement>(null);
 
@@ -54,12 +66,12 @@ export function WorkflowFilm() {
     let disposed = false;
     let raf = 0;
     let cleanup = () => {};
+    let lastPop = -1;
 
-    const reduce = prefersReducedMotion();
-    if (reduce) {
+    if (prefersReducedMotion()) {
       playingRef.current = false;
       setPlaying(false);
-      timeRef.current = 22;
+      timeRef.current = 25;
     }
 
     void import("three").then((THREE: Three) => {
@@ -77,6 +89,7 @@ export function WorkflowFilm() {
       io.observe(mount);
 
       let last = performance.now();
+      let rendered = false;
       const loop = (now: number) => {
         raf = requestAnimationFrame(loop);
         const dt = Math.min(0.1, (now - last) / 1000);
@@ -86,9 +99,10 @@ export function WorkflowFilm() {
           seekRef.current = null;
         } else if (playingRef.current && visible) {
           timeRef.current = (timeRef.current + dt) % FILM_LENGTH;
-        } else if (!visible) {
+        } else if (!visible && rendered) {
           return;
         }
+        rendered = true;
         const t = timeRef.current;
         built.update(t, now / 1000);
         updateOverlays(t, built.headScreen());
@@ -107,21 +121,40 @@ export function WorkflowFilm() {
         captionRef.current.textContent = cap.text;
       }
       if (clockRef.current) clockRef.current.textContent = formatClock(clockHours(t));
-      if (bar1Ref.current) bar1Ref.current.style.width = `${firstWindow(t) * 100}%`;
-      if (bar2Ref.current) bar2Ref.current.style.width = `${secondWindow(t) * 100}%`;
-      if (bar2WrapRef.current) {
-        bar2WrapRef.current.style.opacity = t > 20 ? "1" : "0.35";
+      if (unlockedRef.current) {
+        const text = `${hoursUnlocked(t)} hours`;
+        if (unlockedRef.current.textContent !== text) unlockedRef.current.textContent = text;
       }
-      if (linesRef.current) {
-        Array.from(linesRef.current.children).forEach((el, i) => {
-          const on = t >= terminalLines[i].at;
-          (el as HTMLElement).style.opacity = on ? "1" : "0";
-          (el as HTMLElement).style.transform = on ? "none" : "translateY(4px)";
-        });
+      const used = usage(t);
+      if (usageBarRef.current) usageBarRef.current.style.width = `${used * 100}%`;
+      if (usagePctRef.current) usagePctRef.current.textContent = `${Math.round(used * 100)}%`;
+      if (usageLabelRef.current) {
+        const label =
+          t >= WINDOW_TWO_AT
+            ? "Usage, fresh window from 8:07 am"
+            : t >= 14.3
+              ? "Usage, window from 3:07 am"
+              : "Usage";
+        if (usageLabelRef.current.textContent !== label) usageLabelRef.current.textContent = label;
       }
+
+      // The "+5 hours" pop, restarted each time a window starts.
+      const current = pops.findIndex((p) => t >= p.at && t < p.at + 2.6);
+      if (popRef.current) {
+        if (current !== -1 && current !== lastPop) {
+          if (popTextRef.current) popTextRef.current.textContent = pops[current].text;
+          if (popSubRef.current) popSubRef.current.textContent = pops[current].sub;
+          popRef.current.classList.remove("film-pop");
+          void popRef.current.offsetWidth;
+          popRef.current.classList.add("film-pop");
+        }
+        if (current === -1) popRef.current.classList.remove("film-pop");
+      }
+      lastPop = current;
+
       if (zRef.current) {
-        const asleep = 1 - awake(t);
-        zRef.current.style.opacity = head ? String(asleep) : "0";
+        const z = asleep(t) * (1 - screenShot(t));
+        zRef.current.style.opacity = head ? String(z) : "0";
         if (head) {
           zRef.current.style.left = `${head.x * 100}%`;
           zRef.current.style.top = `${head.y * 100}%`;
@@ -145,7 +178,7 @@ export function WorkflowFilm() {
         ref={mountRef}
         className="relative aspect-[4/5] w-full sm:aspect-[16/10] lg:aspect-[16/9]"
         role="img"
-        aria-label="Animation: a person sleeps at their desk while a small helper bot sends Hi at 3:07 am, starting a fresh Claude usage window before morning."
+        aria-label="Animation: a developer hits his Claude usage limit at 11 pm and falls asleep. At 3:07 am a small Claude bot types a Hi on his laptop, starting a five hour window. He wakes at 7 am to an hour waiting, works, and at 8:07 am a fresh five hour window opens."
       >
         {!ready ? (
           <div className="absolute inset-0 flex items-center justify-center text-[15px] text-[#b0aea5]">
@@ -153,7 +186,6 @@ export function WorkflowFilm() {
           </div>
         ) : null}
 
-        {/* Sleeping z's that follow the sleeper's head. */}
         <div
           ref={zRef}
           aria-hidden
@@ -165,69 +197,50 @@ export function WorkflowFilm() {
           <span className="film-z film-z-3 block translate-x-7 text-[12px]">z</span>
         </div>
 
-        {/* Wall clock readout. */}
-        <div className="pointer-events-none absolute top-4 left-4 rounded-[6px] bg-black/35 px-3 py-1.5 font-mono text-[14px] backdrop-blur-sm sm:top-6 sm:left-6">
+        <div className="pointer-events-none absolute top-4 left-4 rounded-[6px] bg-black/40 px-3 py-1.5 font-mono text-[14px] backdrop-blur-sm sm:top-6 sm:left-6">
           <span ref={clockRef}>11:00 pm</span>
         </div>
 
-        {/* Caption, set like subtitles. */}
+        <div className="pointer-events-none absolute top-4 right-4 rounded-[6px] bg-black/40 px-3 py-1.5 text-right backdrop-blur-sm sm:top-6 sm:right-6">
+          <p className="text-[11px] text-[#b0aea5] sm:text-[12px]">Claude time unlocked</p>
+          <p className="font-mono text-[15px] sm:text-[17px]">
+            <span ref={unlockedRef}>0 hours</span>
+          </p>
+        </div>
+
+        <div
+          ref={popRef}
+          aria-hidden
+          className="pointer-events-none absolute top-[24%] left-1/2 -translate-x-1/2 text-center opacity-0 sm:top-[7%]"
+        >
+          <p
+            ref={popTextRef}
+            className="font-serif text-[44px] leading-none text-[#ffb08f] [text-shadow:0_2px_24px_rgba(217,119,87,0.6)] sm:text-[64px]"
+          >
+            +5 hours
+          </p>
+          <p ref={popSubRef} className="mt-2 text-[13px] text-[#f2ede4] sm:text-[15px]" />
+        </div>
+
         <p
           ref={captionRef}
           aria-live="polite"
-          className="pointer-events-none absolute right-6 bottom-[104px] left-6 text-center text-[17px] font-medium text-balance [text-shadow:0_1px_12px_rgba(0,0,0,0.7)] sm:bottom-[112px] sm:text-[22px]"
+          className="pointer-events-none absolute right-6 bottom-[96px] left-6 text-center text-[17px] font-medium text-balance [text-shadow:0_1px_12px_rgba(0,0,0,0.75)] sm:bottom-[104px] sm:text-[22px]"
         >
           {captions[0].text}
         </p>
 
-        {/* Usage windows. */}
-        <div className="pointer-events-none absolute right-4 bottom-4 left-4 grid grid-cols-2 gap-3 sm:right-6 sm:bottom-6 sm:left-6">
-          <div>
-            <p className="mb-1.5 text-[12px] text-[#d1cfc5] sm:text-[13px]">
-              Window started for you
-            </p>
-            <div className="h-2 overflow-hidden rounded-full bg-white/12">
-              <div ref={bar1Ref} className="h-full w-0 rounded-full bg-[#d97757]" />
-            </div>
+        <div className="pointer-events-none absolute right-4 bottom-4 left-4 sm:right-6 sm:bottom-6 sm:left-6">
+          <div className="mb-1.5 flex items-baseline justify-between gap-3 text-[12px] text-[#d1cfc5] sm:text-[13px]">
+            <p ref={usageLabelRef}>Usage</p>
+            <p ref={usagePctRef} className="font-mono">0%</p>
           </div>
-          <div ref={bar2WrapRef} className="transition-opacity duration-500">
-            <p className="mb-1.5 text-[12px] text-[#d1cfc5] sm:text-[13px]">
-              Fresh window at 8:07 am
-            </p>
-            <div className="h-2 overflow-hidden rounded-full bg-white/12">
-              <div ref={bar2Ref} className="h-full w-0 rounded-full bg-[#f2ede4]" />
-            </div>
+          <div className="h-2 overflow-hidden rounded-full bg-white/12">
+            <div ref={usageBarRef} className="h-full w-0 rounded-full bg-[#d97757]" />
           </div>
         </div>
       </div>
 
-        {/* Live terminal: what GitHub Actions actually runs. */}
-      <div className="pointer-events-none mx-4 mt-4 rounded-[8px] border border-white/10 bg-[#0f0e18]/80 p-3 backdrop-blur-sm sm:absolute sm:top-6 sm:right-6 sm:mx-0 sm:mt-0 sm:w-[340px] sm:p-4">
-        <p className="mb-2 flex items-center gap-2 text-[12px] text-[#b0aea5]">
-          <span className="inline-block h-2 w-2 rounded-full bg-[#788c5d]" />
-          GitHub Actions, Lazy start
-        </p>
-        <div ref={linesRef} className="flex flex-col gap-1 font-mono text-[11.5px] leading-snug sm:text-[12.5px]">
-          {terminalLines.map((line) => (
-            <p
-              key={line.text}
-              className={
-                line.tone === "command"
-                  ? "text-[#f2ede4] transition-all duration-300"
-                  : line.tone === "reply"
-                    ? "text-[#e3a58d] transition-all duration-300"
-                    : line.tone === "ok"
-                      ? "text-[#b5c99a] transition-all duration-300"
-                      : "text-[#87867f] transition-all duration-300"
-              }
-              style={{ opacity: 0 }}
-            >
-              {line.text}
-            </p>
-          ))}
-        </div>
-      </div>
-
-      {/* Controls. */}
       <div className="flex items-center gap-4 border-t border-white/10 px-4 py-3 sm:px-6">
         <button
           type="button"
@@ -258,74 +271,81 @@ export function WorkflowFilm() {
 /* Scene                                                                     */
 /* ------------------------------------------------------------------------ */
 
+function cssFont(name: string, fallback: string): string {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v ? `${v}, ${fallback}` : fallback;
+}
+
 function buildScene(THREE: Three, mount: HTMLDivElement) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.localClippingEnabled = true;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.domElement.style.position = "absolute";
-  renderer.domElement.style.inset = "0";
-  renderer.domElement.style.width = "100%";
-  renderer.domElement.style.height = "100%";
+  Object.assign(renderer.domElement.style, {
+    position: "absolute",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+  });
   mount.prepend(renderer.domElement);
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color("#141322");
-  scene.fog = new THREE.Fog("#141322", 6, 12);
-
-  const camera = new THREE.PerspectiveCamera(38, 16 / 9, 0.1, 50);
+  const camera = new THREE.PerspectiveCamera(40, 16 / 9, 0.05, 50);
 
   const geos: THREE_NS.BufferGeometry[] = [];
   const mats: THREE_NS.Material[] = [];
+  const keep = <G extends THREE_NS.BufferGeometry>(g: G) => (geos.push(g), g);
   const mat = (color: string, extra: THREE_NS.MeshStandardMaterialParameters = {}) => {
-    const m = new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.85, ...extra });
+    const m = new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.82, ...extra });
     mats.push(m);
     return m;
   };
-  const box = (w: number, h: number, d: number, m: THREE_NS.Material) => {
-    const g = new THREE.BoxGeometry(w, h, d);
-    geos.push(g);
-    const mesh = new THREE.Mesh(g, m);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    return mesh;
+  const mesh = (g: THREE_NS.BufferGeometry, m: THREE_NS.Material) => {
+    const x = new THREE.Mesh(keep(g), m);
+    x.castShadow = true;
+    x.receiveShadow = true;
+    return x;
   };
+  const box = (w: number, h: number, d: number, m: THREE_NS.Material) =>
+    mesh(new THREE.BoxGeometry(w, h, d), m);
 
-  // Room.
+  /* Room ----------------------------------------------------------------- */
   const wallMat = mat("#2c2842");
-  const floorMat = mat("#1b1928");
-  const floor = box(12, 0.1, 8, floorMat);
+  const floor = box(12, 0.1, 8, mat("#1d1a2b"));
   floor.position.set(0, -0.05, 0.5);
   scene.add(floor);
   const wall = box(12, 6, 0.1, wallMat);
-  wall.position.set(0, 3, -1.65);
+  wall.position.set(0, 3, -1.75);
   scene.add(wall);
+  const rug = box(2.6, 0.01, 1.6, mat("#3a2f4a"));
+  rug.position.set(0, 0.005, -0.4);
+  scene.add(rug);
 
-  // Window in the back wall, with a sky that turns from night to morning.
-  const winX = -1.15;
+  // Window and sky.
+  const winX = -1.25;
   const winY = 2.05;
-  const winW = 1.5;
-  const winH = 1.15;
+  const winW = 1.4;
+  const winH = 1.1;
   const skyMat = new THREE.MeshBasicMaterial({ color: "#1b2550" });
   mats.push(skyMat);
-  const skyGeo = new THREE.PlaneGeometry(winW, winH);
-  geos.push(skyGeo);
-  const sky = new THREE.Mesh(skyGeo, skyMat);
-  sky.position.set(winX, winY, -1.595);
+  const sky = new THREE.Mesh(keep(new THREE.PlaneGeometry(winW, winH)), skyMat);
+  sky.position.set(winX, winY, -1.695);
   scene.add(sky);
-  const frameMat = mat("#3a3550");
-  const frameParts: [number, number, number, number][] = [
-    [winX, winY + winH / 2, winW + 0.12, 0.06],
-    [winX, winY - winH / 2, winW + 0.12, 0.06],
-    [winX - winW / 2, winY, 0.06, winH + 0.06],
-    [winX + winW / 2, winY, 0.06, winH + 0.06],
-    [winX, winY, 0.04, winH],
-  ];
-  frameParts.forEach(([x, y, w, h]) => {
+  const frameMat = mat("#3e3856");
+  (
+    [
+      [winX, winY + winH / 2, winW + 0.12, 0.06],
+      [winX, winY - winH / 2, winW + 0.16, 0.08],
+      [winX - winW / 2, winY, 0.06, winH + 0.06],
+      [winX + winW / 2, winY, 0.06, winH + 0.06],
+      [winX, winY, 0.04, winH],
+    ] as const
+  ).forEach(([x, y, w, h]) => {
     const f = box(w, h, 0.06, frameMat);
-    f.position.set(x, y, -1.57);
+    f.position.set(x, y, -1.67);
     scene.add(f);
   });
   const clip = [
@@ -334,236 +354,325 @@ function buildScene(THREE: Three, mount: HTMLDivElement) {
     new THREE.Plane(new THREE.Vector3(0, 1, 0), -(winY - winH / 2)),
     new THREE.Plane(new THREE.Vector3(0, -1, 0), winY + winH / 2),
   ];
-  const discGeo = new THREE.CircleGeometry(0.13, 20);
-  geos.push(discGeo);
+  const disc = keep(new THREE.CircleGeometry(0.12, 24));
   const moonMat = new THREE.MeshBasicMaterial({ color: "#f2ede4", transparent: true, clippingPlanes: clip });
   const sunMat = new THREE.MeshBasicMaterial({ color: "#ffb36b", transparent: true, clippingPlanes: clip });
-  mats.push(moonMat, sunMat);
-  const moon = new THREE.Mesh(discGeo, moonMat);
-  moon.position.set(winX + 0.38, winY + 0.25, -1.59);
-  scene.add(moon);
-  const sun = new THREE.Mesh(discGeo, sunMat);
-  sun.scale.setScalar(1.35);
-  sun.position.set(winX - 0.3, winY - 0.9, -1.59);
-  scene.add(sun);
-  const starGeo = new THREE.CircleGeometry(0.012, 5);
-  geos.push(starGeo);
   const starMat = new THREE.MeshBasicMaterial({ color: "#f2ede4", transparent: true, clippingPlanes: clip });
-  mats.push(starMat);
-  for (let i = 0; i < 14; i++) {
-    const s = new THREE.Mesh(starGeo, starMat);
+  mats.push(moonMat, sunMat, starMat);
+  const moon = new THREE.Mesh(disc, moonMat);
+  moon.position.set(winX + 0.35, winY + 0.25, -1.69);
+  scene.add(moon);
+  const sun = new THREE.Mesh(disc, sunMat);
+  sun.scale.setScalar(1.4);
+  sun.position.set(winX - 0.3, winY - 0.9, -1.69);
+  scene.add(sun);
+  const star = keep(new THREE.CircleGeometry(0.012, 5));
+  for (let i = 0; i < 16; i++) {
+    const s = new THREE.Mesh(star, starMat);
     s.position.set(
       winX - winW / 2 + 0.08 + ((i * 0.37) % 1) * (winW - 0.16),
-      winY - winH / 2 + 0.2 + ((i * 0.61) % 1) * (winH - 0.3),
-      -1.592,
+      winY - winH / 2 + 0.25 + ((i * 0.61) % 1) * (winH - 0.35),
+      -1.692,
     );
     scene.add(s);
   }
 
   // Wall clock.
   const clockGroup = new THREE.Group();
-  clockGroup.position.set(0.2, 2.5, -1.58);
+  clockGroup.position.set(0.85, 2.3, -1.68);
   scene.add(clockGroup);
-  const faceGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.05, 24);
-  geos.push(faceGeo);
-  const face = new THREE.Mesh(faceGeo, mat("#f2ede4"));
+  const face = mesh(new THREE.CylinderGeometry(0.27, 0.27, 0.05, 28), mat("#f2ede4"));
   face.rotation.x = Math.PI / 2;
   clockGroup.add(face);
-  const rimGeo = new THREE.TorusGeometry(0.3, 0.03, 6, 24);
-  geos.push(rimGeo);
-  clockGroup.add(new THREE.Mesh(rimGeo, mat("#3a3550")));
+  clockGroup.add(mesh(new THREE.TorusGeometry(0.27, 0.03, 6, 28), mat("#3e3856")));
   const handMat = mat("#141413");
   const hourHand = new THREE.Group();
-  const hh = box(0.035, 0.15, 0.02, handMat);
-  hh.position.y = 0.075;
+  const hh = box(0.035, 0.14, 0.02, handMat);
+  hh.position.y = 0.07;
   hourHand.add(hh);
   hourHand.position.z = 0.04;
   clockGroup.add(hourHand);
   const minuteHand = new THREE.Group();
-  const mh = box(0.025, 0.23, 0.02, handMat);
-  mh.position.y = 0.115;
+  const mh = box(0.024, 0.21, 0.02, handMat);
+  mh.position.y = 0.105;
   minuteHand.add(mh);
   minuteHand.position.z = 0.05;
   clockGroup.add(minuteHand);
 
-  // Desk.
-  const deskMat = mat("#4a3f5e");
-  const top = box(2.3, 0.08, 1.0, deskMat);
-  top.position.set(0, 0.75, 0);
+  // A shelf with a plant, for life.
+  const shelf = box(0.9, 0.05, 0.25, mat("#4a3f5e"));
+  shelf.position.set(1.9, 1.75, -1.6);
+  scene.add(shelf);
+  const pot = mesh(new THREE.CylinderGeometry(0.09, 0.07, 0.16, 7), mat("#d97757"));
+  pot.position.set(1.7, 1.86, -1.6);
+  scene.add(pot);
+  const leaves = mesh(new THREE.IcosahedronGeometry(0.15, 0), mat("#788c5d"));
+  leaves.position.set(1.7, 2.04, -1.6);
+  scene.add(leaves);
+
+  /* Desk ----------------------------------------------------------------- */
+  const deskMat = mat("#5a4c6e");
+  const top = box(2.2, 0.08, 0.95, deskMat);
+  top.position.set(0, 0.75, -0.2);
   scene.add(top);
-  [
-    [-1.05, -0.42],
-    [1.05, -0.42],
-    [-1.05, 0.42],
-    [1.05, 0.42],
-  ].forEach(([x, z]) => {
+  (
+    [
+      [-1.0, -0.6],
+      [1.0, -0.6],
+      [-1.0, 0.2],
+      [1.0, 0.2],
+    ] as const
+  ).forEach(([x, z]) => {
     const leg = box(0.07, 0.71, 0.07, deskMat);
     leg.position.set(x, 0.355, z);
     scene.add(leg);
   });
-
-  // A mug and a small stack of books, for life.
-  const mugGeo = new THREE.CylinderGeometry(0.06, 0.055, 0.13, 8);
-  geos.push(mugGeo);
-  const mug = new THREE.Mesh(mugGeo, mat("#d97757"));
-  mug.castShadow = true;
-  mug.position.set(0.95, 0.855, -0.25);
+  const mug = mesh(new THREE.CylinderGeometry(0.055, 0.05, 0.12, 9), mat("#e8e6dc"));
+  mug.position.set(-0.62, 0.85, -0.38);
   scene.add(mug);
-  const book1 = box(0.36, 0.06, 0.26, mat("#6a9bcc"));
-  book1.position.set(-0.9, 0.82, -0.3);
-  book1.rotation.y = 0.2;
+  const book1 = box(0.34, 0.06, 0.25, mat("#6a9bcc"));
+  book1.position.set(-0.75, 0.82, 0.02);
+  book1.rotation.y = 0.25;
   scene.add(book1);
-  const book2 = box(0.32, 0.05, 0.24, mat("#788c5d"));
-  book2.position.set(-0.9, 0.875, -0.3);
-  book2.rotation.y = -0.1;
+  const book2 = box(0.3, 0.05, 0.23, mat("#c46686"));
+  book2.position.set(-0.75, 0.875, 0.02);
+  book2.rotation.y = 0.05;
   scene.add(book2);
+  const lamp = new THREE.Group();
+  lamp.position.set(-0.85, 0.79, -0.5);
+  scene.add(lamp);
+  const lampBase = mesh(new THREE.CylinderGeometry(0.08, 0.09, 0.03, 8), mat("#141413"));
+  lamp.add(lampBase);
+  const lampArm = box(0.025, 0.4, 0.025, mat("#141413"));
+  lampArm.position.set(0, 0.2, 0);
+  lamp.add(lampArm);
+  const shadeMat = mat("#d97757", { emissive: new THREE.Color("#ffb489"), emissiveIntensity: 0.25 });
+  const shade = mesh(new THREE.ConeGeometry(0.1, 0.12, 8, 1, true), shadeMat);
+  shade.position.set(0.05, 0.42, 0.04);
+  shade.rotation.z = -0.6;
+  lamp.add(shade);
 
-  // Laptop, angled so its screen faces the viewer.
+  /* Laptop: the screen faces the person (toward -z). ---------------------- */
   const laptop = new THREE.Group();
-  laptop.position.set(-0.55, 0.79, 0.12);
-  laptop.rotation.y = 0.55;
+  laptop.position.set(0, 0.79, -0.3);
+  laptop.rotation.y = Math.PI;
   scene.add(laptop);
-  const shellMat = mat("#5c5a6e");
-  const base = box(0.52, 0.03, 0.36, shellMat);
-  base.position.y = 0.015;
+  const shellMat = mat("#b9b7c4", { roughness: 0.5, metalness: 0.2 });
+  const base = box(0.64, 0.025, 0.42, shellMat);
+  base.position.y = 0.0125;
   laptop.add(base);
+  const deck = box(0.56, 0.004, 0.2, mat("#2a2833"));
+  deck.position.set(0, 0.027, -0.04);
+  laptop.add(deck);
+  const pad = box(0.18, 0.003, 0.1, mat("#a3a1af"));
+  pad.position.set(0, 0.026, 0.14);
+  laptop.add(pad);
   const lid = new THREE.Group();
-  lid.position.set(0, 0.03, -0.17);
-  lid.rotation.x = -0.28;
+  lid.position.set(0, 0.025, -0.21);
+  lid.rotation.x = -0.24;
   laptop.add(lid);
-  const lidBox = box(0.52, 0.36, 0.02, shellMat);
-  lidBox.position.y = 0.18;
+  const lidBox = box(0.64, 0.41, 0.018, shellMat);
+  lidBox.position.y = 0.205;
   lid.add(lidBox);
-  const screenMat = new THREE.MeshStandardMaterial({
-    color: "#1a1828",
-    emissive: new THREE.Color("#ffb489"),
-    emissiveIntensity: 0.1,
-    flatShading: true,
-  });
+  const bezel = box(0.62, 0.39, 0.002, mat("#0b0b0b"));
+  bezel.position.set(0, 0.205, 0.01);
+  lid.add(bezel);
+
+  const screenCanvas = document.createElement("canvas");
+  screenCanvas.width = SCREEN_W;
+  screenCanvas.height = SCREEN_H;
+  const screenCtx = screenCanvas.getContext("2d")!;
+  const screenTex = new THREE.CanvasTexture(screenCanvas);
+  screenTex.colorSpace = THREE.SRGBColorSpace;
+  screenTex.anisotropy = 8;
+  const screenMat = new THREE.MeshBasicMaterial({ map: screenTex });
   mats.push(screenMat);
-  const screenGeo = new THREE.PlaneGeometry(0.46, 0.3);
-  geos.push(screenGeo);
-  const screen = new THREE.Mesh(screenGeo, screenMat);
-  screen.position.set(0, 0.18, 0.012);
+  const screen = new THREE.Mesh(keep(new THREE.PlaneGeometry(0.58, 0.3625)), screenMat);
+  screen.position.set(0, 0.205, 0.0115);
   lid.add(screen);
-  const screenLight = new THREE.PointLight("#ffb489", 0, 3, 1.4);
-  screenLight.position.set(-0.4, 1.05, 0.35);
+  const screenLight = new THREE.PointLight("#ffd9c2", 0, 2.2, 1.5);
+  screenLight.position.set(0, 1.02, -0.55);
   scene.add(screenLight);
+  const fonts = {
+    sans: cssFont("--font-inter", "system-ui, sans-serif"),
+    mono: cssFont("--font-jetbrains", "ui-monospace, monospace"),
+    serif: cssFont("--font-source-serif", "Georgia, serif"),
+  };
 
-  // Chair.
-  const chairMat = mat("#2e2a40");
+  /* Chair ---------------------------------------------------------------- */
+  const chairMat = mat("#26223a");
   const seat = box(0.62, 0.08, 0.56, chairMat);
-  seat.position.set(0, 0.5, -0.9);
+  seat.position.set(0, 0.48, -1.02);
   scene.add(seat);
-  const back = box(0.62, 0.7, 0.07, chairMat);
-  back.position.set(0, 0.88, -1.18);
+  const back = box(0.62, 0.78, 0.07, chairMat);
+  back.position.set(0, 0.9, -1.3);
+  back.rotation.x = -0.12;
   scene.add(back);
+  const post = box(0.06, 0.44, 0.06, mat("#141413"));
+  post.position.set(0, 0.22, -1.02);
+  scene.add(post);
 
-  // The sleeper. Upper body pivots at the hips so it can slump onto the desk.
-  const skin = mat("#f1c7a3");
-  const shirt = mat("#5b57c9");
-  const hairMat = mat("#2b1f1a");
+  /* The developer: chunky and simple, a big faceted head on a block suit. -- */
+  const skin = mat("#f3c9a5");
+  const suit = mat("#5b57c9");
+  const suitLight = mat("#6c68d8");
+  const hairMat = mat("#3a2a22");
+  const ink = mat("#141413");
+  const white = mat("#f2ede4");
+
+  // Legs, seated.
+  [-1, 1].forEach((side) => {
+    const thigh = box(0.18, 0.16, 0.46, suit);
+    thigh.position.set(side * 0.12, 0.6, -0.82);
+    scene.add(thigh);
+    const shin = box(0.16, 0.48, 0.16, suit);
+    shin.position.set(side * 0.12, 0.3, -0.62);
+    scene.add(shin);
+    const shoe = box(0.17, 0.08, 0.26, ink);
+    shoe.position.set(side * 0.12, 0.04, -0.56);
+    scene.add(shoe);
+  });
+
   const upper = new THREE.Group();
-  upper.position.set(0, 0.62, -0.82);
+  upper.position.set(0, 0.62, -0.95);
   scene.add(upper);
-  const torso = box(0.56, 0.62, 0.3, shirt);
-  torso.position.y = 0.31;
+  const torso = box(0.5, 0.5, 0.3, suit);
+  torso.position.y = 0.26;
   upper.add(torso);
-  const collar = box(0.12, 0.2, 0.02, mat("#f2ede4"));
-  collar.position.set(0, 0.5, 0.16);
-  upper.add(collar);
+  const shirt = box(0.14, 0.3, 0.01, white);
+  shirt.position.set(0, 0.34, 0.155);
+  upper.add(shirt);
+  [-1, 1].forEach((side) => {
+    const lapel = box(0.09, 0.3, 0.02, suitLight);
+    lapel.position.set(side * 0.09, 0.33, 0.16);
+    lapel.rotation.z = side * 0.18;
+    upper.add(lapel);
+  });
+
+  // A big head, so the face reads from across the room.
   const head = new THREE.Group();
-  head.position.y = 0.82;
+  head.position.y = 0.78;
   upper.add(head);
-  const headGeo = new THREE.IcosahedronGeometry(0.23, 0);
-  geos.push(headGeo);
-  const headMesh = new THREE.Mesh(headGeo, skin);
-  headMesh.castShadow = true;
-  head.add(headMesh);
-  const hairGeo = new THREE.DodecahedronGeometry(0.25, 0);
-  geos.push(hairGeo);
-  const hair = new THREE.Mesh(hairGeo, hairMat);
-  hair.scale.set(1, 0.62, 1);
-  hair.position.set(0, 0.11, -0.03);
-  hair.castShadow = true;
-  head.add(hair);
-  const eyeMat = mat("#141413");
-  const eyes = [-0.085, 0.085].map((x) => {
-    const e = box(0.05, 0.065, 0.02, eyeMat);
-    e.position.set(x, 0.0, 0.205);
+  const skull = mesh(new THREE.IcosahedronGeometry(0.27, 1), skin);
+  skull.scale.set(1, 0.95, 0.92);
+  head.add(skull);
+  [-1, 1].forEach((side) => {
+    const ear = mesh(new THREE.IcosahedronGeometry(0.06, 0), skin);
+    ear.position.set(side * 0.27, -0.01, -0.02);
+    head.add(ear);
+  });
+  const cap = mesh(new THREE.DodecahedronGeometry(0.28, 0), hairMat);
+  cap.scale.set(1.02, 0.42, 1.0);
+  cap.position.set(0, 0.17, -0.03);
+  head.add(cap);
+  (
+    [
+      [-0.14, 0.27, -0.02, 0.4],
+      [-0.05, 0.3, -0.05, 0.15],
+      [0.05, 0.3, -0.06, -0.1],
+      [0.14, 0.27, -0.04, -0.4],
+      [0.0, 0.26, -0.17, 0],
+    ] as const
+  ).forEach(([x, y, z, rz]) => {
+    const spike = mesh(new THREE.ConeGeometry(0.045, 0.16, 4), hairMat);
+    spike.position.set(x, y, z);
+    spike.rotation.set(-0.25, 0, rz);
+    head.add(spike);
+  });
+  const eyeGeo = keep(new THREE.CylinderGeometry(0.03, 0.03, 0.02, 12));
+  const eyes = [-0.095, 0.095].map((x) => {
+    const e = new THREE.Mesh(eyeGeo, ink);
+    e.rotation.x = Math.PI / 2;
+    e.position.set(x, 0.02, 0.245);
     head.add(e);
     return e;
   });
-  // Forearms folded on the desk.
-  [-1, 1].forEach((side) => {
-    const arm = box(0.5, 0.1, 0.13, shirt);
-    arm.position.set(side * 0.1, 0.85, -0.22);
-    arm.rotation.y = side * 0.35;
-    scene.add(arm);
-    const hand = box(0.11, 0.09, 0.11, skin);
-    hand.position.set(side * -0.13, 0.85, -0.13 + side * 0.04);
-    scene.add(hand);
+  // Closed eyes: short downturned lines shown instead of the dots.
+  const lids = [-0.095, 0.095].map((x, i) => {
+    const l = box(0.075, 0.016, 0.02, ink);
+    l.position.set(x, 0.015, 0.245);
+    l.rotation.z = (i === 0 ? 1 : -1) * 0.12;
+    l.visible = false;
+    head.add(l);
+    return l;
+  });
+  const brows: THREE_NS.Mesh[] = [];
+  const mouth = box(0.09, 0.035, 0.02, ink);
+  mouth.position.set(0, -0.11, 0.225);
+  head.add(mouth);
+
+  // Arms: plain blocks with shoulder and elbow joints.
+  const arms = [-1, 1].map((side) => {
+    const shoulder = new THREE.Group();
+    shoulder.position.set(side * 0.3, 0.44, 0);
+    upper.add(shoulder);
+    const upperArm = box(0.13, 0.28, 0.14, suit);
+    upperArm.position.y = -0.14;
+    shoulder.add(upperArm);
+    const elbow = new THREE.Group();
+    elbow.position.y = -0.28;
+    shoulder.add(elbow);
+    const fore = box(0.12, 0.26, 0.13, suit);
+    fore.position.y = -0.13;
+    elbow.add(fore);
+    const hand = box(0.1, 0.09, 0.1, skin);
+    hand.position.y = -0.3;
+    elbow.add(hand);
+    return { side, shoulder, elbow };
   });
 
-  // The helper bot: a small clay block with a visor and an antenna.
+  /* The Claude bot: a clay block with tall eyes, stubby arms, four legs. --- */
   const bot = new THREE.Group();
   scene.add(bot);
-  const clay = mat("#d97757");
-  const botBody = box(0.26, 0.24, 0.24, clay);
-  botBody.position.y = 0.16;
-  bot.add(botBody);
-  const visor = box(0.2, 0.08, 0.02, mat("#1a1828"));
-  visor.position.set(0, 0.19, 0.125);
-  bot.add(visor);
-  const botEyeMat = new THREE.MeshBasicMaterial({ color: "#ffe1cf" });
-  mats.push(botEyeMat);
-  const botEyeGeo = new THREE.BoxGeometry(0.035, 0.035, 0.01);
-  geos.push(botEyeGeo);
-  [-0.045, 0.045].forEach((x) => {
-    const e = new THREE.Mesh(botEyeGeo, botEyeMat);
-    e.position.set(x, 0.19, 0.137);
-    bot.add(e);
+  const botInner = new THREE.Group();
+  bot.add(botInner);
+  const clay = mat("#d97757", { roughness: 0.7 });
+  const body = box(0.3, 0.22, 0.2, clay);
+  body.position.y = 0.18;
+  botInner.add(body);
+  const botEyes = [-0.06, 0.06].map((x) => {
+    const e = box(0.032, 0.066, 0.01, ink);
+    e.position.set(x, 0.2, 0.101);
+    botInner.add(e);
+    return e;
   });
-  const footMat = mat("#b5654a");
-  [-0.07, 0.07].forEach((x) => {
-    const foot = box(0.07, 0.04, 0.1, footMat);
-    foot.position.set(x, 0.02, 0.01);
-    bot.add(foot);
+  const botArms = [-1, 1].map((side) => {
+    const a = new THREE.Group();
+    a.position.set(side * 0.15, 0.17, 0);
+    botInner.add(a);
+    const nub = box(0.06, 0.05, 0.07, clay);
+    nub.position.x = side * 0.03;
+    a.add(nub);
+    return a;
   });
-  const stalkGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.1, 5);
-  geos.push(stalkGeo);
-  const stalk = new THREE.Mesh(stalkGeo, footMat);
-  stalk.position.y = 0.33;
-  bot.add(stalk);
-  const tipGeo = new THREE.IcosahedronGeometry(0.025, 0);
-  geos.push(tipGeo);
-  const tipMat = new THREE.MeshStandardMaterial({ color: "#ffe1cf", emissive: new THREE.Color("#ff9b6a"), emissiveIntensity: 0.4 });
-  mats.push(tipMat);
-  const tip = new THREE.Mesh(tipGeo, tipMat);
-  tip.position.y = 0.39;
-  bot.add(tip);
-  const botLight = new THREE.PointLight("#ff9b6a", 0, 1.2, 2);
-  botLight.position.y = 0.4;
-  bot.add(botLight);
+  const botLegs = [-0.1, -0.035, 0.035, 0.1].map((x) => {
+    const leg = box(0.04, 0.07, 0.06, clay);
+    leg.position.set(x, 0.035, 0);
+    botInner.add(leg);
+    return leg;
+  });
+  const botGlow = new THREE.PointLight("#ff9b6a", 0, 1.2, 2);
+  botGlow.position.set(0, 0.25, 0.25);
+  bot.add(botGlow);
 
-  const botHome = new THREE.Vector3(0.68, 0.79, 0.18);
-  const botAway = new THREE.Vector3(-0.22, 0.79, 0.34);
+  const botHome = new THREE.Vector3(0.72, 0.79, -0.02);
+  const botKeys = new THREE.Vector3(0.45, 0.79, -0.36);
 
-  // Lights.
+  /* Lights --------------------------------------------------------------- */
   const hemi = new THREE.HemisphereLight("#8a98e0", "#2a2638", 1.1);
   scene.add(hemi);
-  const sunLight = new THREE.DirectionalLight("#9fb2ff", 0.9);
-  sunLight.position.set(-2.5, 4, 2.5);
-  sunLight.castShadow = true;
-  sunLight.shadow.mapSize.set(1024, 1024);
-  sunLight.shadow.camera.left = -3;
-  sunLight.shadow.camera.right = 3;
-  sunLight.shadow.camera.top = 3;
-  sunLight.shadow.camera.bottom = -2;
-  scene.add(sunLight);
-  const rim = new THREE.PointLight("#8f7cff", 3.2, 7, 1.6);
+  const key = new THREE.DirectionalLight("#9fb2ff", 1.5);
+  key.position.set(-2.5, 4, 2.5);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  Object.assign(key.shadow.camera, { left: -3, right: 3, top: 3, bottom: -2 });
+  scene.add(key);
+  const rim = new THREE.PointLight("#8f7cff", 3, 7, 1.6);
   rim.position.set(1.8, 2.2, 0.6);
   scene.add(rim);
+  const lampLight = new THREE.PointLight("#ffb489", 1.2, 2.5, 1.8);
+  lampLight.position.set(-0.78, 1.15, -0.45);
+  scene.add(lampLight);
 
   const nightSky = new THREE.Color("#1b2550");
   const dawnSky = new THREE.Color("#f0a070");
@@ -571,8 +680,16 @@ function buildScene(THREE: Three, mount: HTMLDivElement) {
   const nightKey = new THREE.Color("#9fb2ff");
   const dayKey = new THREE.Color("#ffd2a8");
   const nightWall = new THREE.Color("#2c2842");
-  const dayWall = new THREE.Color("#4a4160");
+  const dayWall = new THREE.Color("#4e4466");
   const tmp = new THREE.Color();
+
+  /* Camera shots ---------------------------------------------------------- */
+  const wide = { pos: new THREE.Vector3(-1.0, 1.8, 3.0), look: new THREE.Vector3(0.05, 1.08, -0.5) };
+  const wideTall = { pos: new THREE.Vector3(-1.1, 2.05, 4.4), look: new THREE.Vector3(0.05, 1.1, -0.5) };
+  const shoulder = { pos: new THREE.Vector3(-1.0, 1.72, -1.18), look: new THREE.Vector3(0.1, 0.98, -0.1) };
+  const shoulderTall = { pos: new THREE.Vector3(-0.98, 1.68, -1.0), look: new THREE.Vector3(0.0, 0.98, -0.12) };
+  const camPos = new THREE.Vector3();
+  const camLook = new THREE.Vector3();
 
   function resize() {
     const w = mount.clientWidth;
@@ -586,16 +703,24 @@ function buildScene(THREE: Three, mount: HTMLDivElement) {
   const ro = new ResizeObserver(resize);
   ro.observe(mount);
 
+  let lastScreenDraw = -1;
   const headWorld = new THREE.Vector3();
 
-  function update(t: number, wall: number) {
-    // Camera: a slow drift, pulled back on tall screens so the room fits.
+  function update(t: number, wallClock: number) {
+    /* Camera. */
+    const s = screenShot(t);
     const tall = camera.aspect < 1;
-    const dist = tall ? 4.4 : 3.3;
-    camera.position.set(Math.sin(wall * 0.12) * 0.25, tall ? 1.95 : 1.7, dist);
-    camera.lookAt(-0.1, tall ? 1.15 : 1.25, -0.4);
+    const w = tall ? wideTall : wide;
+    const sh = tall ? shoulderTall : shoulder;
+    camPos.copy(w.pos).lerp(sh.pos, s);
+    camPos.x += Math.sin(wallClock * 0.12) * 0.25 * (1 - s);
+    camLook.copy(w.look).lerp(sh.look, s);
+    camera.position.copy(camPos);
+    camera.fov = tall ? 40 + s * 8 : 40 - s * 12;
+    camera.updateProjectionMatrix();
+    camera.lookAt(camLook);
 
-    // Sky and light.
+    /* Sky and light. */
     const d = daylight(t);
     if (d < 0.5) tmp.copy(nightSky).lerp(dawnSky, d * 2);
     else tmp.copy(dawnSky).lerp(daySky, (d - 0.5) * 2);
@@ -604,55 +729,109 @@ function buildScene(THREE: Three, mount: HTMLDivElement) {
     starMat.opacity = Math.max(0, 1 - d * 2);
     sun.position.y = winY - 0.85 + d * 0.95;
     sunMat.opacity = Math.min(1, d * 1.5);
-    sunLight.color.copy(nightKey).lerp(dayKey, d);
-    sunLight.intensity = 1.5 + d * 1.6;
+    key.color.copy(nightKey).lerp(dayKey, d);
+    key.intensity = 1.5 + d * 1.6;
     hemi.intensity = 1.1 + d * 0.8;
     wallMat.color.copy(nightWall).lerp(dayWall, d);
+    lampLight.intensity = 1.2 * (1 - d);
 
-    // Clock hands.
+    /* Clock. */
     const hrs = clockHours(t);
     minuteHand.rotation.z = -((hrs % 1) * Math.PI * 2);
     hourHand.rotation.z = -(((hrs % 12) / 12) * Math.PI * 2);
 
-    // Sleeper.
-    const a = awake(t);
-    upper.rotation.x = 0.92 * (1 - a) + 0.04 * a;
-    head.rotation.x = -0.25 * (1 - a);
-    const breathe = Math.sin(wall * 1.6) * 0.012 * (1 - a);
-    upper.position.y = 0.62 + breathe;
-    const blink = a > 0.99 && Math.sin(wall * 2.3) > 0.985 ? 0.15 : 1;
-    eyes.forEach((e) => (e.scale.y = a < 0.5 ? 0.18 : blink));
-    head.rotation.y = a * Math.sin(wall * 0.7) * 0.15;
+    /* The developer. */
+    const z = asleep(t);
+    const cel = celebrate(t);
+    const st = Math.max(stretch(t), cel);
+    const ty = typing(t);
+    upper.rotation.x = 0.08 * (1 - z) - 0.3 * z - 0.08 * st;
+    upper.position.y = 0.62 + Math.sin(wallClock * 1.6) * 0.01 * z;
+    head.rotation.x = 0.12 * (1 - z) * (1 - st) - 0.32 * z - 0.25 * st;
+    head.rotation.z = 0.32 * z;
+    head.rotation.y = (1 - z) * (1 - ty) * Math.sin(wallClock * 0.6) * 0.18;
+    const closed = z > 0.4 || (st > 0.5 && cel < 0.1);
+    const blink = !closed && Math.sin(wallClock * 2.1) > 0.985;
+    eyes.forEach((e) => (e.visible = !(closed || blink)));
+    lids.forEach((l) => (l.visible = closed || blink));
+    brows.forEach((b, i) => (b.rotation.z = (i === 0 ? -1 : 1) * 0.15 * z));
+    if (cel > 0.1) {
+      // A big open grin.
+      mouth.scale.set(1.7, 2.2, 1);
+    } else if (z > 0.4) {
+      // Asleep: a small, calm, closed mouth.
+      mouth.scale.set(0.55, 0.45, 1);
+    } else if (st > 0.3) {
+      // Mid stretch: a wide yawn.
+      mouth.scale.set(0.8, 2.6, 1);
+    } else {
+      mouth.scale.set(1, 1, 1);
+    }
+    upper.position.y += cel * Math.abs(Math.sin(wallClock * 8)) * 0.04;
 
-    // Bot hop.
+    arms.forEach(({ side, shoulder: sh, elbow }) => {
+      const tap = Math.sin(wallClock * 22 + side * 1.7) * 0.06 * ty;
+      const typeS = -0.55;
+      const typeE = -1.05 + tap;
+      const sleepS = 0.15;
+      const sleepE = -0.15;
+      const stretchS = -2.9;
+      const stretchE = -0.1;
+      let shX = typeS * (1 - z) + sleepS * z;
+      let elX = typeE * (1 - z) + sleepE * z;
+      shX = shX * (1 - st) + stretchS * st;
+      elX = elX * (1 - st) + stretchE * st;
+      sh.rotation.x = shX;
+      sh.rotation.z = side * (0.12 * z + 0.25 * st);
+      elbow.rotation.x = elX;
+    });
+
+    /* The Claude bot. */
     const k = botTravel(t);
-    bot.position.lerpVectors(botHome, botAway, k);
-    bot.position.y += Math.sin(Math.PI * k) * 0.55 + botTyping(t);
-    const going = t < 11;
-    const look = going ? botAway.clone().sub(botHome) : botHome.clone().sub(botAway);
-    const atLaptop = k > 0.98;
-    bot.rotation.y = atLaptop
-      ? Math.atan2(laptop.position.x - bot.position.x, laptop.position.z - bot.position.z)
-      : k > 0.001 && k < 0.999
-        ? Math.atan2(look.x, look.z)
-        : Math.sin(wall * 0.8) * 0.25 - 0.5;
-    bot.position.y += k === 0 ? Math.abs(Math.sin(wall * 2)) * 0.015 : 0;
-    const sending = t > 9.4 && t < 11.3;
-    tipMat.emissiveIntensity = sending ? 1.6 + Math.sin(wall * 14) * 0.6 : 0.4;
-    botLight.intensity = sending ? 1.4 : 0.15;
+    bot.position.lerpVectors(botHome, botKeys, k);
+    const walking = k > 0.01 && k < 0.99;
+    bot.position.y += walking ? Math.abs(Math.sin(k * Math.PI * 3)) * 0.06 : 0;
+    const stomp = botStomp(t) * Math.abs(Math.sin(wallClock * 16)) * 0.035;
+    const cheer = botCheer(t);
+    bot.position.y += stomp + cheer * Math.abs(Math.sin(wallClock * 9)) * 0.12;
+    // Face the keyboard when there, face the walk direction when walking,
+    // and otherwise glance around from the corner.
+    const toKeys = Math.atan2(botKeys.x - botHome.x, botKeys.z - botHome.z);
+    bot.rotation.y =
+      k > 0.99
+        ? -Math.PI / 2 + 0.25
+        : walking
+          ? botReturning(t)
+            ? toKeys + Math.PI
+            : toKeys
+          : -0.45 + Math.sin(wallClock * 0.7) * 0.25;
+    botLegs.forEach((leg, i) => {
+      leg.position.y = 0.035 + (walking ? Math.max(0, Math.sin(wallClock * 18 + i * Math.PI)) * 0.025 : 0);
+    });
+    botArms.forEach((a, i) => {
+      const typingArm = botStomp(t) && i === 0 ? Math.sin(wallClock * 20) * 0.5 : 0;
+      a.rotation.z = (i === 0 ? 1 : -1) * cheer * 1.2 + typingArm;
+    });
+    botEyes.forEach((e) => (e.scale.y = Math.sin(wallClock * 1.7 + 1) > 0.99 ? 0.15 : 1));
+    botGlow.intensity = cheer * 1.5 + botStomp(t) * 0.8;
 
-    // Laptop glow.
-    const g = screenGlow(t);
-    screenMat.emissiveIntensity = g * 1.4;
-    screenLight.intensity = g * 4;
+    /* Laptop screen. */
+    const b = screenBrightness(t);
+    screenMat.color.setScalar(Math.max(0.05, b));
+    screenLight.intensity = b * 1.6;
+    if (wallClock - lastScreenDraw > 1 / 30) {
+      drawScreen(screenCtx, t, fonts, wallClock);
+      screenTex.needsUpdate = true;
+      lastScreenDraw = wallClock;
+    }
 
     renderer.render(scene, camera);
   }
 
   function headScreen() {
     head.getWorldPosition(headWorld);
-    headWorld.y += 0.25;
-    headWorld.x += 0.1;
+    headWorld.y += 0.26;
+    headWorld.x += 0.12;
     headWorld.project(camera);
     if (headWorld.z > 1) return null;
     return { x: (headWorld.x + 1) / 2, y: (1 - headWorld.y) / 2 };
@@ -660,6 +839,7 @@ function buildScene(THREE: Three, mount: HTMLDivElement) {
 
   function dispose() {
     ro.disconnect();
+    screenTex.dispose();
     geos.forEach((g) => g.dispose());
     mats.forEach((m) => m.dispose());
     renderer.dispose();

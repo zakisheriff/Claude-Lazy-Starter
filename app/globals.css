@@ -143,18 +143,8 @@ select {
   border-radius: 4px;
 }
 
-/* Lenis smooth scrolling hooks. */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
+html {
+  scroll-behavior: smooth;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -277,4 +267,31 @@ html.lenis body {
   border: 0;
   border-radius: 999px;
   background: #f2ede4;
+}
+
+/* The "+5 hours" pop when a window starts. */
+@keyframes film-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 16px) scale(0.85);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.06);
+  }
+  25% {
+    transform: translate(-50%, 0) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -6px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -18px) scale(1);
+  }
+}
+
+.film-pop {
+  animation: film-pop 2.6s ease-out forwards;
 }
