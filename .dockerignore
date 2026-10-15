@@ -1,8 +1,0 @@
-node_modules
-.next
-.git
-.data
-claude-session.json
-*.log
-.DS_Store
-README.md

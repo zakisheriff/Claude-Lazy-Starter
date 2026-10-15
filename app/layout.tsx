@@ -9,7 +9,6 @@ import {
   softwareApplicationLd,
   webSiteLd,
 } from "@/lib/seo/jsonld";
-import SmoothScroll from "@/components/layout/SmoothScroll";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
@@ -106,11 +105,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen antialiased">
-        <SmoothScroll>
-          <Navbar />
-          <main id="main">{children}</main>
-          <Footer />
-        </SmoothScroll>
+        <Navbar />
+        <main id="main">{children}</main>
+        <Footer />
         <Analytics />
       </body>
     </html>

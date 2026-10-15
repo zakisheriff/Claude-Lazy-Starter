@@ -3,14 +3,7 @@ import { site } from "@/lib/seo/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        // The API surface holds no indexable content.
-        disallow: ["/api/"],
-      },
-    ],
+    rules: [{ userAgent: "*", allow: "/" }],
     sitemap: `${site.url}/sitemap.xml`,
     host: site.url,
   };

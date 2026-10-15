@@ -24,8 +24,6 @@ export const site = {
   nav: [
     { label: "How it works", href: "/#how-it-works" },
     { label: "Questions", href: "/#questions" },
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Settings", href: "/settings" },
   ],
 } as const;
 

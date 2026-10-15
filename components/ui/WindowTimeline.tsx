@@ -4,8 +4,7 @@ import { cn } from "@/lib/utils/cn";
  * The signature element. A single day drawn as a 24 hour band, with coloured
  * segments for sleep, the usage window, and the time reclaimed from sleeping
  * hours, plus labelled markers for the moments that matter. Pure and
- * presentational, so it renders on the server and is reused on the landing
- * page and the dashboard.
+ * presentational, so it renders on the server.
  */
 
 export type Tone =
