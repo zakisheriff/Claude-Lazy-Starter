@@ -43,13 +43,21 @@ There are no sleep or working hours to configure.
 - UI: reusable primitives in `components/ui`, layout in `components/layout`,
   scroll reveals in `components/motion`, page sections in
   `components/home`, `components/dashboard`, `components/settings`.
-- The signature element is `WindowTimeline`, a 24 hour day band reused on the
-  landing page and the dashboard.
+- The signature elements are the workflow film and `WindowTimeline`, a 24
+  hour day band reused on the landing page and the dashboard.
 
 ## Current features
 
-- Home: hero, before and after comparison, ordered how it works, FAQ, closing
-  call to action. Every section fills the viewport.
+- Home: a long form article. Dark horizon hero with a numbered contents list,
+  introduction, how it works (an animated workflow film, before and after
+  timelines, a comparison table, an hour by hour night), set it up (four steps
+  with copyable commands), questions, closing call to action. A section rail
+  on the left tracks progress on wide screens.
+- Workflow film (`components/home/film`): a low poly room built in code with
+  three.js, loaded lazily on the client. `story.ts` is the pure script (clock,
+  captions, terminal lines, bars); `WorkflowFilm.tsx` renders the scene and
+  HTML overlays from one film clock. Pauses offscreen, has play, pause, and a
+  scrubber, and starts paused at a still frame under reduced motion.
 - Dashboard: window status, activation status and reason, next refresh,
   remaining estimate, activation history, daily usage timeline, activate now,
   automatic activation toggle, connect and disconnect, expired session prompt.
@@ -67,10 +75,15 @@ There are no sleep or working hours to configure.
 
 ## Development rules
 
-- Match the claude.ai aesthetic. Warm paper, terracotta accent, Inter only,
-  spacious full viewport sections, normal capitalization. No uppercase, no
-  dashes or hyphens in user facing text, no emojis, no decorative icons or dots,
-  no eyebrow or label headings, no unnecessary cards. Inputs are 16px.
+- Editorial look modeled on the anthropic.com
+  launch articles: ivory paper (`#faf9f5`), slate ink, clay accent
+  (`#d97757`), Source Serif 4 for display and reading text, Inter for interface
+  text, JetBrains Mono for code. Dark hero with a glowing horizon, an 800px
+  serif reading column, square bordered tables with a clay highlighted column,
+  and a dark multi column footer. Never use Anthropic's logo, licensed fonts,
+  or artwork; recreate the feel with free fonts and CSS. The only uppercase is
+  the small tracked line above the hero title. No dashes or hyphens in user
+  facing copy, no emojis. Inputs are 16px.
 - Server components by default; client components only where required.
 - Keep domain logic pure; keep persistence and automation behind their
   interfaces.

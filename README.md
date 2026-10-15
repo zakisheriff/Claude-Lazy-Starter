@@ -19,6 +19,7 @@ still has time left and a fresh one is already queued behind it.
 
 - Next.js App Router, TypeScript, Tailwind CSS v4.
 - GSAP and ScrollTrigger, Lenis smooth scrolling, Framer Motion.
+- A three.js workflow film on the home page, drawn entirely in code.
 - Pure domain logic, a swappable storage `Repository`, and a swappable
   automation `ActivationDriver` with two implementations: a simulated driver and
   a real Claude Code driver, and a legacy Playwright driver.

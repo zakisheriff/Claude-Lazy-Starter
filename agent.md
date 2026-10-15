@@ -45,7 +45,10 @@ other user's session is ever stored.
 
 ## Current features
 
-- Landing page explaining the idea with a before and after day timeline.
+- Landing page as a long form article: horizon hero, introduction, how it
+  works with an animated three.js workflow film (`components/home/film`),
+  before and after timelines, a comparison table, the four setup steps, and
+  questions.
 - Dashboard: live window status, remaining countdown, next refresh, activation
   status and reason, automatic activation toggle, connect and disconnect,
   activate now, daily usage timeline, activation history.
@@ -66,9 +69,11 @@ other user's session is ever stored.
 
 ## Design surface
 
-- One warm background everywhere (the `--panel` colour, matching the footer),
-  set on `body`. No near white section backgrounds. Only cards lift above it
-  using `--paper-raised`. The navbar shares the same background.
+- Ivory `--paper` on `body`. The home hero and the footer are dark
+  (`--night`). The navbar is transparent with light text over the hero and
+  settles onto translucent ivory once the page scrolls past it.
+- Tokens live in `app/globals.css`; `.prose-article` sets the serif reading
+  column and `.leader` draws the dotted contents leaders.
 - Every interactive control shows a pointer cursor. Every text input is 16px.
 
 ## Future improvements
@@ -83,10 +88,15 @@ other user's session is ever stored.
 
 ## Development rules
 
-- Design: match the claude.ai feel. Warm paper background, terracotta accent,
-  Inter everywhere, generous spacing, full viewport sections. No uppercase text,
-  no dashes or hyphens in user facing copy, no emojis, no decorative icons, no
-  eyebrow labels, no gratuitous cards. Text inputs are 16px.
+- Design: Editorial look modeled on the anthropic.com
+  launch articles: ivory paper (`#faf9f5`), slate ink, clay accent
+  (`#d97757`), Source Serif 4 for display and reading text, Inter for interface
+  text, JetBrains Mono for code. Dark hero with a glowing horizon, an 800px
+  serif reading column, square bordered tables with a clay highlighted column,
+  and a dark multi column footer. Never use Anthropic's logo, licensed fonts,
+  or artwork; recreate the feel with free fonts and CSS. The only uppercase is
+  the small tracked line above the hero title. No dashes or hyphens in user
+  facing copy, no emojis. Inputs are 16px.
 - Keep server components the default. Reach for a client component only when
   needed.
 - Keep domain logic pure and in `lib/domain`. Keep persistence behind
