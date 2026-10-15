@@ -138,14 +138,13 @@ export function MobileMenu({
         ref={footerRef}
         className="border-t border-line px-8 py-8 text-[15px] text-ink-soft"
       >
-        <a
-          href={site.repo}
-          target="_blank"
-          rel="noreferrer"
+        <Link
+          href="/#set-it-up"
+          onClick={onClose}
           className="inline-flex h-12 items-center rounded-[var(--radius)] bg-night px-6 text-[16px] text-on-night"
         >
-          Get it on GitHub
-        </a>
+          Set it up
+        </Link>
       </div>
     </div>
   );

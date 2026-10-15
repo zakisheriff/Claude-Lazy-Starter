@@ -1,6 +1,5 @@
 import Reveal from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
-import { site } from "@/lib/seo/site";
 
 export function Cta() {
   return (
@@ -10,21 +9,16 @@ export function Cta() {
           Wake up to time already waiting
         </h2>
         <p className="mx-auto mt-6 max-w-[560px] font-serif text-[19px] leading-relaxed text-ink-soft">
-          Two minutes of setup, then it runs every hour on its own. Free and open
-          source.
+          A few minutes of setup, then it runs every hour on its own, free, in
+          your own GitHub account.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button href="/#set-it-up" size="lg">
             Set it up
           </Button>
-          <a
-            href={site.repo}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex h-12 items-center rounded-[var(--radius)] border border-line-strong px-6 text-[16px] text-ink transition-colors hover:bg-panel"
-          >
-            View the source
-          </a>
+          <Button href="/#how-it-works" size="lg" variant="secondary">
+            Watch how it works
+          </Button>
         </div>
       </Reveal>
     </section>

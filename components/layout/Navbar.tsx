@@ -87,10 +87,8 @@ export function Navbar() {
                 );
               })}
             </nav>
-            <a
-              href={site.repo}
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              href="/#set-it-up"
               className={cn(
                 "inline-flex h-11 items-center rounded-[var(--radius)] px-5 text-[16px] transition-colors",
                 dark
@@ -98,8 +96,8 @@ export function Navbar() {
                   : "bg-night text-on-night hover:bg-night-soft",
               )}
             >
-              Get it on GitHub
-            </a>
+              Set it up
+            </Link>
           </div>
 
           <button

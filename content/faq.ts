@@ -21,7 +21,7 @@ export const faq = [
   {
     question: "Where is my token kept?",
     answer:
-      "Only in your own GitHub repository, as an encrypted Actions secret. This site never sees it, and there is no shared server holding anyone's account. Each person runs their own copy.",
+      "Only in your own GitHub repository, as an encrypted Actions secret. This site never sees it, and there is no shared server holding anyone's account. Each person runs the workflow in their own private repository.",
   },
   {
     question: "Does the hourly message use up my limit?",
@@ -41,6 +41,6 @@ export const faq = [
   {
     question: "Is this made by Anthropic?",
     answer:
-      "No. Claude Lazy Starter is an independent open source project. It only uses Claude Code, the official command line tool, with your own subscription.",
+      "No. Claude Lazy Starter is an independent project. It only uses Claude Code, the official command line tool, with your own subscription.",
   },
 ] as const;

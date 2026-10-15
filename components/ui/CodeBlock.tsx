@@ -3,10 +3,17 @@
 import { useState } from "react";
 
 /**
- * A single command, set in mono on a quiet panel, with a copy button. Used by
- * the setup steps so a reader can paste each command straight into a terminal.
+ * Code set in mono on a quiet panel, with a copy button. A single command sits
+ * on one line; a file (when `filename` is given) shows its path above a
+ * scrollable body so a reader can paste it straight into place.
  */
-export function CodeBlock({ code }: { code: string }) {
+export function CodeBlock({
+  code,
+  filename,
+}: {
+  code: string;
+  filename?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -15,8 +22,35 @@ export function CodeBlock({ code }: { code: string }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
-      // Clipboard can be unavailable; the command stays selectable.
+      // Clipboard can be unavailable; the code stays selectable.
     }
+  }
+
+  const button = (
+    <button
+      type="button"
+      onClick={copy}
+      className="shrink-0 cursor-pointer text-[14px] text-ink-soft transition-colors hover:text-ink"
+      aria-label={filename ? `Copy ${filename}` : `Copy ${code}`}
+    >
+      {copied ? "Copied" : "Copy"}
+    </button>
+  );
+
+  if (filename) {
+    return (
+      <div className="mt-5 overflow-hidden rounded-[var(--radius-sm)] border border-line bg-panel">
+        <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-3">
+          <code className="min-w-0 truncate font-mono text-[13px] text-ink-soft">
+            {filename}
+          </code>
+          {button}
+        </div>
+        <pre className="max-h-[360px] overflow-auto px-5 py-4 font-mono text-[13px] leading-relaxed text-ink">
+          <code>{code}</code>
+        </pre>
+      </div>
+    );
   }
 
   return (
@@ -24,14 +58,7 @@ export function CodeBlock({ code }: { code: string }) {
       <code className="min-w-0 overflow-x-auto whitespace-nowrap font-mono text-[15px] text-ink">
         {code}
       </code>
-      <button
-        type="button"
-        onClick={copy}
-        className="shrink-0 cursor-pointer text-[14px] text-ink-soft transition-colors hover:text-ink"
-        aria-label={`Copy ${code}`}
-      >
-        {copied ? "Copied" : "Copy"}
-      </button>
+      {button}
     </div>
   );
 }

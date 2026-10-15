@@ -16,7 +16,6 @@ const columns = [
     title: "Resources",
     links: [
       { label: "Questions", href: "/#questions" },
-      { label: "Source code", href: site.repo },
       { label: "Claude Code", href: "https://docs.claude.com/en/docs/claude-code/overview" },
       { label: "Claude plans", href: "https://claude.com/pricing" },
     ],
@@ -25,7 +24,6 @@ const columns = [
     title: "Project",
     links: [
       { label: "The Atom", href: "https://theatom.lk" },
-      { label: "Report an issue", href: `${site.repo}/issues` },
     ],
   },
 ] as const;
@@ -80,7 +78,7 @@ export function Footer() {
       <div className="mx-auto flex max-w-[1400px] flex-col gap-2 px-6 pb-14 text-[14px] text-on-night-soft lg:flex-row lg:justify-between lg:px-16">
         <p>Copyright {year} {site.name}</p>
         <p>
-          An independent open source project. Not affiliated with or endorsed by
+          An independent project. Not affiliated with or endorsed by
           Anthropic.
         </p>
       </div>

@@ -65,8 +65,8 @@ export function howToLd() {
       {
         "@type": "HowToStep",
         position: 1,
-        name: "Get your own copy",
-        text: "Fork the Claude Lazy Starter repository into your GitHub account.",
+        name: "Create a private repository",
+        text: "Create a new private GitHub repository and add the Lazy start workflow at .github/workflows/lazy-start.yml.",
       },
       {
         "@type": "HowToStep",
@@ -84,7 +84,7 @@ export function howToLd() {
         "@type": "HowToStep",
         position: 4,
         name: "Turn it on",
-        text: "Enable workflows in the Actions tab and run Lazy start once. It then runs every hour.",
+        text: "Open the Actions tab and run Lazy start once. It then runs every hour.",
       },
     ],
   };
