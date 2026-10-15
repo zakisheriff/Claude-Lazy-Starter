@@ -156,6 +156,8 @@ Claude-Lazy-Starter/
 - **A GitHub account** (free)
 - **Claude Code** installed on your computer
 
+Everything else, including the GitHub CLI, is installed and checked by the setup prompt.
+
 ### 1. Open Claude Code
 
 Open Claude Code in any folder.
@@ -165,12 +167,13 @@ Open Claude Code in any folder.
 Copy the prompt from the **[Set it up](https://claudelazystarter.theatom.lk/#set-it-up)** section of the website and paste it in. Claude will:
 
 ```text
-1. Check the GitHub CLI is installed and logged in
-2. Create a private repository named claude-lazy-starter
-3. Add .github/workflows/lazy-start.yml and push it
-4. Ask you to run claude setup-token in your own terminal
-5. Ask you to save it with gh secret set CLAUDE_CODE_OAUTH_TOKEN
-6. Run the workflow once and confirm it passed
+1. Check your computer and install the GitHub CLI if it is missing
+2. Have you sign in to GitHub in your browser (with the workflow scope)
+3. Create a private repository named claude-lazy-starter
+4. Add .github/workflows/lazy-start.yml through the GitHub API (no git needed)
+5. Ask you to run claude setup-token in your own terminal
+6. Ask you to save it with gh secret set CLAUDE_CODE_OAUTH_TOKEN
+7. Run the workflow once, fix anything that fails, and confirm it passed
 ```
 
 ### 3. That's It

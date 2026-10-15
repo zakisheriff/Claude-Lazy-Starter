@@ -15,38 +15,44 @@ const workflow = readFileSync(
  *  and saved by the reader in their own terminal, never pasted into chat. */
 const prompt = `Set up Claude Lazy Starter for me. It keeps my Claude usage window running by sending a tiny "Hi" through Claude Code once an hour from GitHub Actions, so a fresh five hour window starts even while I sleep.
 
-Work through these steps one at a time and tell me what you are doing:
+Work through these steps one at a time. Tell me what you are doing, check each step really worked before moving on, and fix anything that is missing instead of stopping. Whenever I need to type something myself, give me the exact command to copy and wait until I say it is done.
 
-1. Check that the GitHub CLI (gh) is installed and logged in. If it is missing, install it (brew install gh on macOS, otherwise follow cli.github.com). If it is not logged in, ask me to run gh auth login in my own terminal and wait for me.
+1. Check my computer. Find out my operating system. Check that the GitHub CLI (gh) is installed with gh --version. If it is missing, install it for me: on macOS use brew install gh (if Homebrew itself is missing, give me the official Homebrew install command to run in my own terminal, because it needs my password); on Windows use winget install --id GitHub.cli; on Linux follow the official instructions at cli.github.com. Then confirm gh --version works.
 
-2. Create a new private GitHub repository named claude-lazy-starter in my account and clone it into a temporary folder.
+2. Sign me in to GitHub. Run gh auth status. If I am not signed in, or the token does not include the workflow scope, ask me to run this in a separate terminal window and finish the sign in in my browser:
+gh auth login --hostname github.com --git-protocol https --web --scopes workflow
+(If I am already signed in but only the workflow scope is missing, ask me to run gh auth refresh --hostname github.com --scopes workflow instead.) If I do not have a GitHub account, tell me to create a free one at github.com/signup first. When I am done, run gh auth status again and find my username with gh api user --jq .login.
 
-3. In that repository create the file .github/workflows/lazy-start.yml with exactly this content, then commit and push it:
+3. Create a private GitHub repository named claude-lazy-starter in my account with gh repo create claude-lazy-starter --private --add-readme. If it already exists, reuse it.
+
+4. Add the file .github/workflows/lazy-start.yml to that repository with exactly the content below. Upload it with the GitHub API (gh api, the repository contents endpoint, base64 encoded content) so git is not needed. If the file already exists, update it. Then confirm it shows up with gh workflow list --repo MY_USERNAME/claude-lazy-starter.
 
 \`\`\`yaml
 ${workflow}
 \`\`\`
 
-4. Ask me to open a separate terminal window, run claude setup-token, and finish the sign in. Do not ask me to paste the token into this chat.
+5. Create my Claude token. Ask me to run claude setup-token in a separate terminal window and finish the sign in in my browser with the Claude account that has my Pro or Max plan. It prints a long token. Do not ask me to paste the token into this chat.
 
-5. Ask me to run this in that same terminal, replacing OWNER with my GitHub username, and to paste the token when it prompts:
-gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo OWNER/claude-lazy-starter
-Wait until I confirm it is done.
+6. Save the token in GitHub. Give me this exact command with my real username filled in, ask me to run it in that same terminal, and paste the token when it asks:
+gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo MY_USERNAME/claude-lazy-starter
+When I am done, check it with gh secret list --repo MY_USERNAME/claude-lazy-starter (it only shows the name, never the value).
 
-6. Start the workflow once with gh workflow run lazy-start.yml, follow it with gh run watch, and tell me whether it succeeded. If it failed, read the logs with gh run view --log-failed, explain the problem, and help me fix it.
+7. Test it. Start the workflow once with gh workflow run lazy-start.yml --repo MY_USERNAME/claude-lazy-starter, wait a few seconds, find the run with gh run list, follow it with gh run watch, and tell me whether it succeeded. If it failed, read the logs with gh run view --log-failed, explain the problem in plain words, help me fix it, and run it again until it passes.
 
-7. Finish by giving me the repository link and confirming it will now run every hour on its own.`;
+8. Finish by giving me the repository link and the Actions page link, and confirm it will now run every hour on its own. Tell me how to check it worked: the next morning, Settings then Usage on claude.ai should show my window resetting early in the day.`;
 
 export function SetItUp() {
   return (
     <ArticleSection id="set-it-up" title="Set it up">
       <Prose className="mt-10">
         <p>
-          You need a Claude Pro or Max plan, a free GitHub account, and Claude
-          Code. Open Claude Code in any folder, paste the prompt below, and
-          follow along. Claude creates a private repository, adds the workflow,
-          and runs it once to check. You save your token yourself, so it never
-          passes through the chat.
+          You need a Claude Pro or Max plan and Claude Code. Open Claude Code
+          in any folder, paste the prompt below, and follow along. Claude
+          checks your computer and installs the GitHub CLI if it is missing,
+          walks you through signing in to GitHub, creates a private
+          repository, adds the workflow, and runs it once to check. The two
+          sign ins happen in your own browser, and you save your token
+          yourself, so it never passes through the chat.
         </p>
       </Prose>
 

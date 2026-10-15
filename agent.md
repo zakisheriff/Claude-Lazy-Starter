@@ -50,7 +50,11 @@ website. The source repository is private, so the site never links to it.
   to 0 percent (+5 hours, he celebrates). Two cameras: a wide room shot and an
   over the shoulder screen shot, with a separate framing for tall screens.
 - Before and after timelines, a comparison table, an hour by hour night.
-- Setup: one prompt for Claude Code with a copy button.
+- Setup: one prompt for Claude Code with a copy button. The prompt checks the
+  computer, installs the GitHub CLI if missing, has the reader sign in to GitHub
+  with the workflow scope, creates the private repository, uploads the workflow
+  through the GitHub API (no git needed), has the reader create and save the
+  token in their own terminal, then runs and verifies the workflow.
 - Questions, closing call to action.
 - Footer: a full viewport dark closing page, no logo. Link columns, a centered
   one line serif wordmark, and the credit "built by The Atom" (theatom.lk).

@@ -39,7 +39,10 @@ The source repository is private; the site never links to it.
 - Film: limit at 11 pm, sleep, the Claude bot sends Hi at 3:07 am (+5 hours),
   sunrise, wake and stretch, work to 90 percent usage, reset to 0 percent at
   8:07 am (+5 hours, celebration). Wide and over the shoulder cameras.
-- Timelines, comparison table, hour by hour night, one prompt setup, questions.
+- Timelines, comparison table, hour by hour night, questions.
+- One prompt setup: installs and signs in to the GitHub CLI (workflow scope),
+  creates the repository, uploads the workflow via the GitHub API, has the
+  reader save the token themselves, then runs and verifies it.
 - Full viewport footer with a centered wordmark and the credit to The Atom
   (theatom.lk), who builds Claude Lazy Starter.
 - SEO, AEO, GEO: linked JSON-LD graph (Organization The Atom, WebSite, WebPage

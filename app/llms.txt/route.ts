@@ -26,7 +26,7 @@ Built by ${site.builder.name} (${site.builder.url}). An independent project, not
 ## Set it up
 
 1. Paste the setup prompt from ${site.url}/#set-it-up into Claude Code.
-2. Claude creates a private GitHub repository and adds the Lazy start workflow.
+2. Claude installs the GitHub CLI if it is missing, has you sign in to GitHub in your browser, creates a private repository, and adds the Lazy start workflow.
 3. In your own terminal, run claude setup-token and save the token with gh secret set CLAUDE_CODE_OAUTH_TOKEN.
 4. Claude runs the workflow once to check it. It then runs every hour by itself.
 

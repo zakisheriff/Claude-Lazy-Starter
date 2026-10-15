@@ -119,8 +119,8 @@ export function howToLd() {
       {
         "@type": "HowToStep",
         position: 2,
-        name: "Let Claude create the repository",
-        text: "Claude creates a private GitHub repository named claude-lazy-starter and adds the Lazy start workflow.",
+        name: "Let Claude set up GitHub",
+        text: "Claude installs the GitHub CLI if it is missing, has you sign in to GitHub in your browser, then creates a private repository named claude-lazy-starter and adds the Lazy start workflow.",
       },
       {
         "@type": "HowToStep",
