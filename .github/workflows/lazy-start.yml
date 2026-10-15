@@ -1,0 +1,68 @@
+# Keeps a Claude usage window always running, even while your computer sleeps.
+#
+# Every hour it sends one tiny message through the official Claude Code CLI on
+# your subscription. Claude Pro and Max share one five hour window across
+# claude.ai and Claude Code, so if the window has ended this starts a fresh one,
+# and if a window is already running the ping simply uses a sliver of it.
+#
+# Setup, once:
+#   1. On your computer run: claude setup-token
+#   2. Add the printed token as a repository secret named CLAUDE_CODE_OAUTH_TOKEN
+#      (Settings, Secrets and variables, Actions, New repository secret).
+#   3. Optional repository variables: LAZY_MESSAGE (default "Hi") and
+#      LAZY_MODEL (default "haiku").
+
+name: Lazy start
+
+on:
+  schedule:
+    # Minute 7 of every hour. GitHub may run scheduled jobs a few minutes late.
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: lazy-start
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check the token is configured
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "::error::Add the CLAUDE_CODE_OAUTH_TOKEN secret (run: claude setup-token)."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Start the window
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          LAZY_MESSAGE: ${{ vars.LAZY_MESSAGE || 'Hi' }}
+          LAZY_MODEL: ${{ vars.LAZY_MODEL || 'haiku' }}
+        run: |
+          set +e
+          out=$(claude -p "$LAZY_MESSAGE" --model "$LAZY_MODEL" --tools "" \
+            --no-session-persistence --output-format json 2>&1)
+          code=$?
+          echo "$out" | head -c 2000
+          echo
+          if [ $code -ne 0 ] || echo "$out" | grep -q '"is_error":true'; then
+            if echo "$out" | grep -qiE 'usage limit|rate limit|limit reached'; then
+              echo "Window still exhausted; the next hourly run will start it."
+              exit 0
+            fi
+            echo "::error::Claude Code could not send the message. If the token expired, run claude setup-token again and update the secret."
+            exit 1
+          fi
+          echo "Sent \"$LAZY_MESSAGE\". A usage window is running."
