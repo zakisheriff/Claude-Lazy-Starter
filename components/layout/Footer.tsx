@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/seo/site";
 
@@ -6,31 +5,30 @@ const columns = [
   {
     title: "Product",
     links: [
+      { label: "Introduction", href: "/#introduction" },
       { label: "How it works", href: "/#how-it-works" },
       { label: "Set it up", href: "/#set-it-up" },
+      { label: "Questions", href: "/#questions" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Questions", href: "/#questions" },
       { label: "Claude Code", href: "https://docs.claude.com/en/docs/claude-code/overview" },
       { label: "Claude plans", href: "https://claude.com/pricing" },
+      { label: "GitHub Actions", href: "https://docs.github.com/en/actions" },
     ],
   },
   {
-    title: "Project",
-    links: [
-      { label: "The Atom", href: "https://theatom.lk" },
-    ],
+    title: "The Atom",
+    links: [{ label: "theatom.lk", href: site.builder.url }],
   },
 ] as const;
 
 function FooterLink({ href, label }: { href: string; label: string }) {
-  const external = href.startsWith("http");
   const className =
-    "text-[15px] text-on-night-soft transition-colors hover:text-on-night";
-  return external ? (
+    "text-[16px] text-on-night-soft transition-colors hover:text-on-night";
+  return href.startsWith("http") ? (
     <a href={href} target="_blank" rel="noreferrer" className={className}>
       {label}
     </a>
@@ -41,24 +39,15 @@ function FooterLink({ href, label }: { href: string; label: string }) {
   );
 }
 
+/**
+ * The closing page: a full viewport dark footer with the link columns, a large
+ * wordmark, and the credit to The Atom, who builds Claude Lazy Starter.
+ */
 export function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="bg-night text-on-night">
-      <div className="mx-auto grid max-w-[1400px] gap-14 px-6 pt-24 pb-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-16">
-        <div className="flex flex-col justify-between gap-10">
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt=""
-              width={40}
-              height={40}
-              className="h-10 w-10 rounded-[8px]"
-            />
-            <span className="text-[18px] font-medium">{site.name}</span>
-          </Link>
-        </div>
-
+    <footer className="flex min-h-[100svh] flex-col bg-night text-on-night">
+      <div className="mx-auto grid w-full max-w-[1400px] gap-12 px-6 pt-24 sm:grid-cols-3 lg:px-16 lg:pt-32">
         {columns.map((col) => (
           <nav key={col.title} aria-label={col.title}>
             <p className="text-[15px] font-semibold">{col.title}</p>
@@ -73,12 +62,31 @@ export function Footer() {
         ))}
       </div>
 
-      <div className="mx-auto flex max-w-[1400px] flex-col gap-2 px-6 pb-14 text-[14px] text-on-night-soft lg:flex-row lg:justify-between lg:px-16">
-        <p>Copyright {year} {site.name}</p>
-        <p>
-          An independent project. Not affiliated with or endorsed by
-          Anthropic.
+      <div className="mt-auto flex w-full justify-center overflow-hidden px-4 pt-24">
+        <p
+          aria-hidden
+          className="font-serif text-[clamp(38px,10vw,156px)] leading-none tracking-[-0.03em] whitespace-nowrap text-on-night"
+        >
+          {site.name}
         </p>
+      </div>
+
+      <div className="mx-auto mt-16 w-full max-w-[1400px] px-6 pb-10 lg:px-16">
+      <div className="flex flex-col gap-3 border-t border-white/10 pt-8 text-[14px] text-on-night-soft lg:flex-row lg:items-center lg:justify-between">
+        <p>
+          {site.name} is built by{" "}
+          <a
+            href={site.builder.url}
+            target="_blank"
+            rel="noreferrer"
+            className="text-on-night underline underline-offset-4 transition-opacity hover:opacity-80"
+          >
+            {site.builder.name}
+          </a>
+          . Copyright {year}.
+        </p>
+        <p>An independent project. Not affiliated with or endorsed by Anthropic.</p>
+      </div>
       </div>
     </footer>
   );

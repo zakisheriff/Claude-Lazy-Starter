@@ -39,8 +39,8 @@ export const faq = [
       "Yes. Set the LAZY_MESSAGE and LAZY_MODEL repository variables to change what is sent, or disable the Lazy start workflow from the Actions tab to pause it at any time.",
   },
   {
-    question: "Is this made by Anthropic?",
+    question: "Who makes Claude Lazy Starter?",
     answer:
-      "No. Claude Lazy Starter is an independent project. It only uses Claude Code, the official command line tool, with your own subscription.",
+      "Claude Lazy Starter is built by The Atom (theatom.lk). It is an independent project, not made by or affiliated with Anthropic. It only uses Claude Code, the official command line tool, with your own subscription.",
   },
 ] as const;
