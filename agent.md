@@ -97,4 +97,4 @@ website. The source repository is private, so the site never links to it.
 - Respect reduced motion in every animation.
 - After every completed change, update `agent.md` and `claude.md`, then commit
   with a conventional message (`feat`, `fix`, `style`, `refactor`, `docs`) and
-  no co author trailer. Only push when the owner says so.
+  no co author trailer, then push to GitHub right away.
