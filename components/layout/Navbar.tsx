@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { site } from "@/lib/seo/site";
 import { cn } from "@/lib/utils/cn";
+import { Button } from "@/components/ui/Button";
 import { MobileMenu } from "./MobileMenu";
 
 /**
@@ -78,17 +79,13 @@ export function Navbar() {
                 );
               })}
             </nav>
-            <Link
+            <Button
               href="/#set-it-up"
-              className={cn(
-                "inline-flex h-11 items-center rounded-[var(--radius)] px-5 text-[16px] transition-colors",
-                dark
-                  ? "bg-white text-night hover:bg-[#e8e6dc]"
-                  : "bg-night text-on-night hover:bg-night-soft",
-              )}
+              variant={dark ? "secondary" : "primary"}
+              data-theme={dark ? "dark" : undefined}
             >
               Set it up
-            </Link>
+            </Button>
           </div>
 
           <button

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import { gsap } from "gsap";
 import { site } from "@/lib/seo/site";
 import { prefersReducedMotion } from "@/lib/utils/motion";
@@ -138,13 +139,14 @@ export function MobileMenu({
         ref={footerRef}
         className="border-t border-line px-8 py-8 text-[15px] text-ink-soft"
       >
-        <Link
+        <Button
           href="/#set-it-up"
           onClick={onClose}
-          className="flex h-14 w-full items-center justify-center rounded-[var(--radius)] bg-night text-[18px] font-medium text-on-night"
+          size="lg"
+          className="w-full"
         >
           Set it up
-        </Link>
+        </Button>
       </div>
     </div>
   );

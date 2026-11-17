@@ -26,6 +26,10 @@ The source repository is private; the site never links to it.
 - Framework: Next.js App Router, TypeScript, Tailwind CSS v4, one static page.
 - Motion: GSAP with ScrollTrigger for reveals and the mobile menu, Framer
   Motion for small transitions, three.js for the film. No Lenis.
+- Controls: Liquid Glass from `@zakisheriff/liquid-glass` (stylesheet imported
+  in `app/layout.tsx`). `Button` wraps `GlassButton` (primary is filled clay,
+  secondary regular glass); the film uses `GlassButton` and `GlassSlider` under
+  `data-theme="dark"`; copy buttons are clear glass.
 - `components/home`: page sections. `SetItUp.tsx` reads the workflow file at
   build time and embeds it in the setup prompt.
 - `components/home/film`: `story.ts` (pure script in the film clock),

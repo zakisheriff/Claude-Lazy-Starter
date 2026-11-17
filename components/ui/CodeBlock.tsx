@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { GlassButton } from "@zakisheriff/liquid-glass";
 
 /**
  * Code set in mono on a quiet panel, with a copy button. A single command sits
@@ -32,14 +33,16 @@ export function CodeBlock({
   }
 
   const button = (
-    <button
+    <GlassButton
       type="button"
+      size="sm"
+      variant="clear"
       onClick={copy}
-      className="shrink-0 cursor-pointer text-[14px] text-ink-soft transition-colors hover:text-ink"
+      className="shrink-0"
       aria-label={filename ? `Copy ${filename}` : `Copy ${code}`}
     >
       {copied ? "Copied" : copyLabel}
-    </button>
+    </GlassButton>
   );
 
   if (filename) {

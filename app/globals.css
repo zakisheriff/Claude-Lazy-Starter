@@ -247,28 +247,6 @@ html {
   animation-delay: 1.6s;
 }
 
-.film-scrub {
-  appearance: none;
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 999px;
-}
-
-.film-scrub::-webkit-slider-thumb {
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  background: #f2ede4;
-}
-
-.film-scrub::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border: 0;
-  border-radius: 999px;
-  background: #f2ede4;
-}
-
 /* The "+5 hours" pop when a window starts. */
 @keyframes film-pop {
   0% {

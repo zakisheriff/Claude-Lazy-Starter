@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { GlassButton, GlassSlider } from "@zakisheriff/liquid-glass";
 import type * as THREE_NS from "three";
 import { prefersReducedMotion } from "@/lib/utils/motion";
 import { SCREEN_H, SCREEN_W, drawScreen } from "./screen";
@@ -48,7 +49,7 @@ export function WorkflowFilm() {
   const usageLabelRef = useRef<HTMLParagraphElement>(null);
   const usagePctRef = useRef<HTMLParagraphElement>(null);
   const zRef = useRef<HTMLDivElement>(null);
-  const scrubRef = useRef<HTMLInputElement>(null);
+  const scrubRef = useRef<ScrubHandle>(null);
 
   const [playing, setPlaying] = useState(true);
   const [ready, setReady] = useState(false);
@@ -160,9 +161,7 @@ export function WorkflowFilm() {
           zRef.current.style.top = `${head.y * 100}%`;
         }
       }
-      if (scrubRef.current && document.activeElement !== scrubRef.current) {
-        scrubRef.current.value = String(t);
-      }
+      scrubRef.current?.show(t);
     }
 
     return () => {
@@ -241,28 +240,83 @@ export function WorkflowFilm() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 border-t border-white/10 px-4 py-3 sm:px-6">
-        <button
+      <div
+        data-theme="dark"
+        className="flex items-center gap-4 border-t border-white/10 px-4 py-3 sm:px-6"
+      >
+        <GlassButton
           type="button"
+          size="sm"
+          variant="clear"
           onClick={() => setPlaying((p) => !p)}
-          className="w-14 shrink-0 cursor-pointer text-left text-[14px] text-[#d1cfc5] transition-colors hover:text-white"
+          className="w-20 shrink-0"
         >
           {playing ? "Pause" : "Play"}
-        </button>
-        <input
+        </GlassButton>
+        <FilmScrub
           ref={scrubRef}
-          type="range"
-          min={0}
-          max={FILM_LENGTH}
-          step={0.01}
-          defaultValue={0}
-          aria-label="Scrub through the night"
-          onChange={(e) => {
-            seekRef.current = Number(e.target.value);
+          onSeek={(t) => {
+            seekRef.current = t;
           }}
-          className="film-scrub h-1 w-full cursor-pointer"
         />
       </div>
+    </div>
+  );
+}
+
+type ScrubHandle = { show: (t: number) => void };
+
+/**
+ * The glass scrub bar. It owns its own value so the film clock can move it
+ * every frame without rendering the whole film, and it stops following the
+ * clock while the reader is dragging it.
+ */
+function FilmScrub({
+  ref,
+  onSeek,
+}: {
+  ref: React.Ref<ScrubHandle>;
+  onSeek: (t: number) => void;
+}) {
+  const [value, setValue] = useState(0);
+  const dragging = useRef(false);
+
+  useImperativeHandle(ref, () => ({
+    show: (t) => {
+      if (!dragging.current) setValue(t);
+    },
+  }));
+
+  useEffect(() => {
+    const release = () => {
+      dragging.current = false;
+    };
+    window.addEventListener("pointerup", release);
+    window.addEventListener("pointercancel", release);
+    return () => {
+      window.removeEventListener("pointerup", release);
+      window.removeEventListener("pointercancel", release);
+    };
+  }, []);
+
+  return (
+    <div
+      className="min-w-0 flex-1"
+      onPointerDown={() => {
+        dragging.current = true;
+      }}
+    >
+      <GlassSlider
+        min={0}
+        max={FILM_LENGTH}
+        value={value}
+        tint="#d97757"
+        aria-label="Scrub through the night"
+        onChange={(t) => {
+          setValue(t);
+          onSeek(t);
+        }}
+      />
     </div>
   );
 }

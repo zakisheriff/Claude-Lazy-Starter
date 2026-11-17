@@ -35,6 +35,11 @@ website. The source repository is private, so the site never links to it.
     drives the HTML overlays (clock, hours unlocked, +5 hours pop, caption,
     usage bar, play and scrub controls). Pauses offscreen; under reduced
     motion it starts paused on a still frame.
+- Liquid Glass: `@zakisheriff/liquid-glass`, stylesheet imported in
+  `app/layout.tsx`. `Button` wraps `GlassButton` (primary filled clay, secondary
+  glass, ghost clear, danger destructive). The film's play button and scrub bar
+  are `GlassButton` and `GlassSlider`; `FilmScrub` keeps its own value so the
+  film clock moves it each frame without rendering the whole film.
 - `components/ui`: `Button`, `CodeBlock` (copy button, file and wrap modes),
   `WindowTimeline` (the 24 hour band).
 - `lib/seo`: site config and JSON-LD builders. `lib/utils`: helpers.

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import "@zakisheriff/liquid-glass/styles.css";
 import "./globals.css";
 import { site } from "@/lib/seo/site";
 import {
